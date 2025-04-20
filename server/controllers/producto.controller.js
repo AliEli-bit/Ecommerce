@@ -1,0 +1,217 @@
+import Producto from '../models/Producto.model.js';
+import Proveedor from '../models/Proveedor.model.js';
+
+// Crear un nuevo producto
+export const crearProducto = async (req, res) => {
+  try {
+    const { nombre, descripcion, precio, unidad, stock, categoria, proveedor } = req.body;
+    const fundacion = req.user.entidadRelacionada;
+
+    // Validar campos requeridos
+    if (!nombre || !descripcion || !precio || !unidad || !stock || !categoria || !proveedor) {
+      return res.status(400).json({
+        message: 'Todos los campos son requeridos',
+        errores: {
+          nombre: !nombre ? 'El nombre es requerido' : null,
+          descripcion: !descripcion ? 'La descripción es requerida' : null,
+          precio: !precio ? 'El precio es requerido' : null,
+          unidad: !unidad ? 'La unidad es requerida' : null,
+          stock: !stock ? 'El stock es requerido' : null,
+          categoria: !categoria ? 'La categoría es requerida' : null,
+          proveedor: !proveedor ? 'El proveedor es requerido' : null
+        }
+      });
+    }
+
+    // Verificar que el proveedor existe y pertenece a la fundación
+    const proveedorExiste = await Proveedor.findOne({
+      _id: proveedor,
+      fundacion: fundacion
+    });
+
+    if (!proveedorExiste) {
+      return res.status(400).json({ 
+        message: 'Proveedor no encontrado o no pertenece a la fundación' 
+      });
+    }
+
+    if (proveedorExiste.estado === 'rechazado') {
+      return res.status(400).json({ 
+        message: 'No se puede crear un producto con un proveedor rechazado' 
+      });
+    }
+
+    const producto = await Producto.create({
+      nombre,
+      descripcion,
+      precio: Number(precio),
+      unidad,
+      stock: Number(stock),
+      categoria,
+      proveedor,
+      fundacion
+    });
+
+    res.status(201).json(producto);
+  } catch (error) {
+    console.error('Error al crear producto:', error);
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        message: 'Error de validación',
+        errores: Object.values(error.errors).map(err => err.message)
+      });
+    }
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Obtener todos los productos de una fundación
+export const obtenerProductos = async (req, res) => {
+  try {
+    console.log('Usuario:', req.user);
+    const fundacion = req.user?.entidadRelacionada;
+    
+    if (!fundacion) {
+      console.log('No se encontró fundación asociada al usuario');
+      return res.status(200).json([]); // Devolver array vacío si no hay fundación
+    }
+
+    const { categoria, proveedor, estado } = req.query;
+    const query = { fundacion };
+    
+    if (categoria) query.categoria = categoria;
+    if (proveedor) query.proveedor = proveedor;
+    if (estado) query.estado = estado;
+
+    console.log('Consulta:', query);
+
+    const productos = await Producto.find(query)
+      .populate('proveedor', 'nombre email')
+      .sort({ createdAt: -1 });
+
+    console.log('Productos encontrados:', productos.length);
+    console.log('Primer producto (si existe):', productos[0]);
+
+    // Evitar el caché en desarrollo
+    res.set('Cache-Control', 'no-store');
+    
+    if (!productos || productos.length === 0) {
+      console.log('No se encontraron productos para la fundación');
+      return res.status(200).json([]); // Devolver array vacío si no hay productos
+    }
+
+    res.json(productos);
+  } catch (error) {
+    console.error('Error en obtenerProductos:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+// Obtener un producto por ID
+export const obtenerProducto = async (req, res) => {
+  try {
+    const fundacion = req.user.entidadRelacionada;
+    const producto = await Producto.findOne({
+      _id: req.params.id,
+      fundacion
+    }).populate('proveedor', 'nombre email');
+
+    if (!producto) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    res.json(producto);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Actualizar un producto
+export const actualizarProducto = async (req, res) => {
+  try {
+    const fundacion = req.user.entidadRelacionada;
+    const producto = await Producto.findOne({
+      _id: req.params.id,
+      fundacion
+    });
+
+    if (!producto) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    // Si se cambia el proveedor, verificar que pertenece a la fundación
+    if (req.body.proveedor && req.body.proveedor !== producto.proveedor.toString()) {
+      const proveedorExiste = await Proveedor.findOne({
+        _id: req.body.proveedor,
+        fundacion
+      });
+
+      if (!proveedorExiste) {
+        return res.status(400).json({ message: 'Proveedor no encontrado o no pertenece a la fundación' });
+      }
+    }
+
+    Object.keys(req.body).forEach(key => {
+      producto[key] = req.body[key];
+    });
+
+    const productoActualizado = await producto.save();
+    res.json(productoActualizado);
+  } catch (error) {
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({
+        message: 'Error de validación',
+        errores: Object.values(error.errors).map(err => err.message)
+      });
+    }
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Eliminar un producto
+export const eliminarProducto = async (req, res) => {
+  try {
+    const fundacion = req.user.entidadRelacionada;
+    const producto = await Producto.findOneAndDelete({
+      _id: req.params.id,
+      fundacion
+    });
+
+    if (!producto) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    res.json({ message: 'Producto eliminado correctamente' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+}; 
+
+
+//Obtener todos los productos 
+
+export const obtenerTodosProductosdef = async (req, res) => {
+  try {
+    const { categoria, proveedor, estado } = req.query;
+    const query = {};
+
+    if (categoria) query.categoria = categoria;
+    if (proveedor && mongoose.Types.ObjectId.isValid(proveedor)) {
+      query.proveedor = proveedor;
+    }
+    if (estado) query.estado = estado;
+
+    console.log('Consulta (todos):', query);
+
+    const productos = await Producto.find(query)
+      .populate('proveedor', 'nombre email')
+      .sort({ createdAt: -1 });
+
+    res.set('Cache-Control', 'no-store');
+    return res.json(productos);
+  } catch (error) {
+    console.error('Error en obtenerTodosProductos:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
