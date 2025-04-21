@@ -52,74 +52,24 @@ import { useNavigate } from 'react-router-dom';
 const API_URL = '/api';
 
 const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
-  <Card 
-    sx={{ 
-      height: '100%',
-      background: `linear-gradient(135deg, ${color}15 0%, ${color}05 100%)`,
-      transition: 'transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out',
-      '&:hover': {
-        transform: 'translateY(-5px)',
-        boxShadow: `0 8px 16px ${color}20`
-      }
-    }}
+  <div 
+    className={`bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1`}
   >
-    <CardContent sx={{ p: 3 }}>
-      <Box display="flex" alignItems="center" mb={2}>
-        <Box
-          sx={{
-            backgroundColor: `${color}20`,
-            borderRadius: '12px',
-            p: 1.5,
-            mr: 2,
-            transition: 'transform 0.2s ease-in-out',
-            '&:hover': {
-              transform: 'scale(1.1)'
-            }
-          }}
-        >
-          <Icon sx={{ color: color, fontSize: 28 }} />
-        </Box>
-        <Typography variant="h6" component="div" sx={{ color: 'text.secondary' }}>
-          {title}
-        </Typography>
-      </Box>
-      <Typography 
-        variant="h4" 
-        component="div" 
-        gutterBottom
-        sx={{ 
-          fontWeight: 'bold',
-          color: color,
-          mb: 1
-        }}
-      >
-        {value}
-      </Typography>
-      {subtitle && (
-        <Typography 
-          variant="body2" 
-          sx={{ 
-            color: 'text.secondary',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 1
-          }}
-        >
-          <Box
-            component="span"
-            sx={{
-              width: 8,
-              height: 8,
-              borderRadius: '50%',
-              backgroundColor: color,
-              opacity: 0.5
-            }}
-          />
-          {subtitle}
-        </Typography>
-      )}
-    </CardContent>
-  </Card>
+    <div className="flex justify-between items-start">
+      <div>
+        <p className="text-gray-600 text-sm font-medium mb-1">{title}</p>
+        <h3 className="text-3xl font-bold text-gray-900 mb-2">{value}</h3>
+        {subtitle && (
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${color}-100 text-${color}-800`}>
+            {subtitle}
+          </span>
+        )}
+      </div>
+      <div className={`p-3 rounded-lg bg-${color}-100`}>
+        <Icon className={`w-6 h-6 text-${color}-600`} />
+      </div>
+    </div>
+  </div>
 );
 
 const Proveedores = () => {
@@ -372,644 +322,462 @@ const Proveedores = () => {
   };
 
   return (
-    <Box sx={{ bgcolor: '#f5f5f5', minHeight: '100vh', p: 3 }}>
-      <Box 
-        display="flex" 
-        justifyContent="space-between" 
-        alignItems="center" 
-        mb={4}
-        sx={{
-          '& .MuiButton-root': {
-            borderRadius: 2,
-            textTransform: 'none',
-            px: 3,
-            py: 1,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-            '&:hover': {
-              transform: 'translateY(-2px)',
-              transition: 'transform 0.2s ease-in-out'
-            }
-          }
-        }}
-      >
-        <Box display="flex" alignItems="center">
-          <Tooltip title="Volver al Dashboard">
-            <IconButton 
-              onClick={() => navigate('/admin/dashboard')}
-              sx={{ 
-                mr: 2,
-                backgroundColor: 'white',
-                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-                '&:hover': {
-                  backgroundColor: 'primary.light',
-                  color: 'white'
-                }
-              }}
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <button
+                onClick={() => navigate('/admin/dashboard')}
+                className="mr-4 p-2 rounded-lg text-gray-600 hover:bg-gray-100"
+              >
+                <ArrowBackIcon className="w-6 h-6" />
+              </button>
+              <div className="flex items-center">
+                <svg className="h-8 w-8 text-red-500" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                </svg>
+                <span className="ml-2 text-xl font-semibold text-gray-900">Proveedores</span>
+              </div>
+            </div>
+            <button
+              onClick={() => handleOpenDialog()}
+              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
-              <ArrowBackIcon />
-            </IconButton>
-          </Tooltip>
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontWeight: 'bold',
-              background: 'linear-gradient(135deg, #1976d2 0%, #1565c0 100%)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            Proveedores
-          </Typography>
-        </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddIcon />}
-          onClick={() => handleOpenDialog()}
-        >
-          Nuevo Proveedor
-        </Button>
-      </Box>
+              <AddIcon className="w-5 h-5 mr-2" />
+              Nuevo Proveedor
+            </button>
+          </div>
+        </div>
+      </header>
 
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} sm={6} md={3}>
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
           <StatCard
             title="Total Proveedores"
             value={proveedores.length}
             icon={BusinessIcon}
-            color="#1976d2"
+            color="blue"
             subtitle="Proveedores registrados"
           />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Fundaciones"
             value={new Set(proveedores.map(p => p.fundacion?._id)).size}
             icon={LocationIcon}
-            color="#2e7d32"
+            color="green"
             subtitle="Fundaciones asociadas"
           />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Productos"
             value={proveedores.reduce((acc, p) => acc + (p.productos?.length || 0), 0)}
             icon={InventoryIcon}
-            color="#ed6c02"
+            color="yellow"
             subtitle="Total de productos"
           />
-        </Grid>
-        <Grid item xs={12} sm={6} md={3}>
           <StatCard
             title="Categorías"
             value={new Set(proveedores.map(p => p.tipoServicio)).size}
             icon={CategoryIcon}
-            color="#9c27b0"
+            color="purple"
             subtitle="Tipos de servicios"
           />
-        </Grid>
-      </Grid>
+        </div>
 
-      {loading ? (
-        <Box 
-          display="flex" 
-          justifyContent="center" 
-          alignItems="center" 
-          minHeight="200px"
-          sx={{ 
-            bgcolor: 'white',
-            borderRadius: 2,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      ) : error ? (
-        <Box 
-          display="flex" 
-          justifyContent="center" 
-          alignItems="center" 
-          minHeight="200px"
-          sx={{ 
-            bgcolor: 'white',
-            borderRadius: 2,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-          }}
-        >
-          <Typography color="error">{error}</Typography>
-        </Box>
-      ) : proveedores.length === 0 ? (
-        <Box 
-          display="flex" 
-          justifyContent="center" 
-          alignItems="center" 
-          minHeight="200px"
-          sx={{ 
-            bgcolor: 'white',
-            borderRadius: 2,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
-          }}
-        >
-          <Typography>No hay proveedores registrados</Typography>
-        </Box>
-      ) : (
-        <TableContainer 
-          component={Paper}
-          sx={{ 
-            borderRadius: 2,
-            boxShadow: '0 2px 4px rgba(0,0,0,0.05)',
-            '& .MuiTableCell-root': {
-              py: 2
-            }
-          }}
-        >
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 'bold' }}>Nombre</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>NIT</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Fundación</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Contacto</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Productos</TableCell>
-                <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {proveedores.map((proveedor) => (
-                <React.Fragment key={proveedor._id}>
-                  <TableRow 
-                    sx={{
-                      '&:hover': {
-                        backgroundColor: 'rgba(0,0,0,0.02)'
-                      },
-                      cursor: 'pointer'
-                    }}
-                    onClick={() => toggleRow(proveedor._id)}
-                  >
-                    <TableCell>
-                      <Box display="flex" alignItems="center" gap={1}>
-                        <BusinessIcon sx={{ color: 'primary.main' }} />
-                        <Typography variant="body1">{proveedor.nombre}</Typography>
-                        {expandedRows[proveedor._id] ? <ExpandLessIcon /> : <ExpandMoreIcon />}
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Typography variant="body2">{proveedor.nit}</Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={proveedor.fundacion?.nombre || 'Sin fundación'}
-                        color={proveedor.fundacion ? 'primary' : 'default'}
-                        size="small"
-                        sx={{ borderRadius: 1 }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Box display="flex" flexDirection="column" gap={0.5}>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <PhoneIcon sx={{ color: 'warning.main', fontSize: 16 }} />
-                          <Typography variant="body2">{proveedor.telefono}</Typography>
-                        </Box>
-                        <Box display="flex" alignItems="center" gap={1}>
-                          <EmailIcon sx={{ color: 'info.main', fontSize: 16 }} />
-                          <Typography variant="body2">{proveedor.email}</Typography>
-                        </Box>
-                      </Box>
-                    </TableCell>
-                    <TableCell>
-                      <Chip 
-                        label={proveedor.productos?.length || 0}
-                        color="success"
-                        size="small"
-                        sx={{ borderRadius: 1 }}
-                      />
-                    </TableCell>
-                    <TableCell>
-                      <Box display="flex" gap={1}>
-                        <Tooltip title="Editar">
-                          <IconButton 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleOpenDialog(proveedor);
-                            }}
-                            sx={{
-                              '&:hover': {
-                                backgroundColor: 'primary.light',
-                                color: 'white'
-                              }
-                            }}
-                          >
-                            <EditIcon />
-                          </IconButton>
-                        </Tooltip>
-                        <Tooltip title="Eliminar">
-                          <IconButton 
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleDelete(proveedor._id);
-                            }}
-                            sx={{
-                              '&:hover': {
-                                backgroundColor: 'error.light',
-                                color: 'white'
-                              }
-                            }}
-                          >
-                            <DeleteIcon />
-                          </IconButton>
-                        </Tooltip>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
-                  {expandedRows[proveedor._id] && (
-                    <TableRow>
-                      <TableCell colSpan={6} sx={{ py: 0 }}>
-                        <Box sx={{ bgcolor: 'rgba(0,0,0,0.02)', p: 2 }}>
-                          <Typography variant="subtitle2" gutterBottom sx={{ fontWeight: 'bold' }}>
-                            Productos
-                          </Typography>
-                          {proveedor.productos?.length > 0 ? (
-                            <Grid container spacing={2}>
-                              {proveedor.productos.map((producto) => (
-                                <Grid item xs={12} sm={6} md={4} key={producto._id}>
-                                  <Card 
-                                    sx={{ 
-                                      height: '100%',
-                                      transition: 'transform 0.2s ease-in-out',
-                                      '&:hover': {
-                                        transform: 'translateY(-2px)'
-                                      }
-                                    }}
-                                  >
-                                    <CardContent>
-                                      <Box display="flex" justifyContent="space-between" alignItems="flex-start" mb={1}>
-                                        <Typography variant="h6">
-                                          {producto.nombre}
-                                        </Typography>
-                                        <Box>
-                                          <Tooltip title="Editar">
-                                            <IconButton 
-                                              size="small"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleOpenProductDialog(producto);
-                                              }}
-                                            >
-                                              <EditIcon />
-                                            </IconButton>
-                                          </Tooltip>
-                                          <Tooltip title="Eliminar">
-                                            <IconButton 
-                                              size="small"
-                                              onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleDeleteProducto(producto._id);
-                                              }}
-                                            >
-                                              <DeleteIcon />
-                                            </IconButton>
-                                          </Tooltip>
-                                        </Box>
-                                      </Box>
-                                      <Typography 
-                                        variant="body2" 
-                                        color="text.secondary"
-                                        sx={{ 
-                                          display: '-webkit-box',
-                                          WebkitLineClamp: 2,
-                                          WebkitBoxOrient: 'vertical',
-                                          overflow: 'hidden',
-                                          mb: 1
-                                        }}
-                                      >
-                                        {producto.descripcion}
-                                      </Typography>
-                                      <Box display="flex" alignItems="center" gap={1} mb={1}>
-                                        <MoneyIcon sx={{ color: 'success.main', fontSize: 16 }} />
-                                        <Typography variant="body2">
-                                          ${producto.precio}
-                                        </Typography>
-                                      </Box>
-                                      <Box display="flex" alignItems="center" gap={1}>
-                                        <CartIcon sx={{ color: 'primary.main', fontSize: 16 }} />
-                                        <Typography variant="body2">
-                                          Stock: {producto.stock} {producto.unidad}
-                                        </Typography>
-                                      </Box>
-                                    </CardContent>
-                                  </Card>
-                                </Grid>
-                              ))}
-                            </Grid>
-                          ) : (
-                            <Typography variant="body2" color="text.secondary">
-                              No hay productos registrados
-                            </Typography>
-                          )}
-                        </Box>
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </React.Fragment>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      )}
+        {loading ? (
+          <div className="flex justify-center items-center min-h-[60vh]">
+            <CircularProgress />
+          </div>
+        ) : error ? (
+          <div className="flex justify-center items-center min-h-[60vh] bg-white rounded-xl shadow-sm">
+            <p className="text-red-600">{error}</p>
+          </div>
+        ) : proveedores.length === 0 ? (
+          <div className="flex justify-center items-center min-h-[60vh] bg-white rounded-xl shadow-sm">
+            <p className="text-gray-500">No hay proveedores registrados</p>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-gray-200">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NIT</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fundación</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contacto</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Productos</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {proveedores.map((proveedor) => (
+                    <React.Fragment key={proveedor._id}>
+                      <tr 
+                        className="hover:bg-gray-50 cursor-pointer"
+                        onClick={() => toggleRow(proveedor._id)}
+                      >
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center">
+                            <BusinessIcon className="w-5 h-5 text-blue-600 mr-2" />
+                            <span className="text-sm font-medium text-gray-900">{proveedor.nombre}</span>
+                            {expandedRows[proveedor._id] ? <ExpandLessIcon className="ml-2" /> : <ExpandMoreIcon className="ml-2" />}
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="text-sm text-gray-500">{proveedor.nit}</span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            proveedor.fundacion ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'
+                          }`}>
+                            {proveedor.fundacion?.nombre || 'Sin fundación'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4">
+                          <div className="space-y-1">
+                            <div className="flex items-center">
+                              <PhoneIcon className="w-4 h-4 text-yellow-600 mr-2" />
+                              <span className="text-sm text-gray-500">{proveedor.telefono}</span>
+                            </div>
+                            <div className="flex items-center">
+                              <EmailIcon className="w-4 h-4 text-purple-600 mr-2" />
+                              <span className="text-sm text-gray-500">{proveedor.email}</span>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4">
+                          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            {proveedor.productos?.length || 0}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          <div className="flex items-center space-x-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleOpenDialog(proveedor);
+                              }}
+                              className="p-1 rounded-lg text-blue-600 hover:bg-blue-50"
+                            >
+                              <EditIcon className="w-5 h-5" />
+                            </button>
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleDelete(proveedor._id);
+                              }}
+                              className="p-1 rounded-lg text-red-600 hover:bg-red-50"
+                            >
+                              <DeleteIcon className="w-5 h-5" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                      {expandedRows[proveedor._id] && (
+                        <tr>
+                          <td colSpan={6} className="px-6 py-4 bg-gray-50">
+                            <div className="space-y-4">
+                              <div className="flex justify-between items-center">
+                                <h3 className="text-sm font-semibold text-gray-900">Productos</h3>
+                                <button
+                                  onClick={() => handleOpenProductDialog()}
+                                  className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs font-medium rounded-md text-white bg-gray-900 hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                                >
+                                  <AddIcon className="w-4 h-4 mr-1" />
+                                  Nuevo Producto
+                                </button>
+                              </div>
+                              {proveedor.productos?.length > 0 ? (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                  {proveedor.productos.map((producto) => (
+                                    <div 
+                                      key={producto._id}
+                                      className="bg-white rounded-lg shadow-sm p-4 hover:shadow-md transition-shadow duration-200"
+                                    >
+                                      <div className="flex justify-between items-start mb-2">
+                                        <h4 className="text-sm font-medium text-gray-900">{producto.nombre}</h4>
+                                        <div className="flex space-x-1">
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleOpenProductDialog(producto);
+                                            }}
+                                            className="p-1 rounded-lg text-blue-600 hover:bg-blue-50"
+                                          >
+                                            <EditIcon className="w-4 h-4" />
+                                          </button>
+                                          <button
+                                            onClick={(e) => {
+                                              e.stopPropagation();
+                                              handleDeleteProducto(producto._id);
+                                            }}
+                                            className="p-1 rounded-lg text-red-600 hover:bg-red-50"
+                                          >
+                                            <DeleteIcon className="w-4 h-4" />
+                                          </button>
+                                        </div>
+                                      </div>
+                                      <p className="text-sm text-gray-500 mb-2 line-clamp-2">{producto.descripcion}</p>
+                                      <div className="flex items-center space-x-4">
+                                        <div className="flex items-center">
+                                          <MoneyIcon className="w-4 h-4 text-green-600 mr-1" />
+                                          <span className="text-sm text-gray-900">${producto.precio}</span>
+                                        </div>
+                                        <div className="flex items-center">
+                                          <CartIcon className="w-4 h-4 text-blue-600 mr-1" />
+                                          <span className="text-sm text-gray-900">
+                                            {producto.stock} {producto.unidad}
+                                          </span>
+                                        </div>
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              ) : (
+                                <p className="text-sm text-gray-500">No hay productos registrados</p>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+      </main>
 
+      {/* Dialog Proveedor */}
       <Dialog 
         open={openDialog} 
-        onClose={handleCloseDialog} 
-        maxWidth="md" 
+        onClose={handleCloseDialog}
+        maxWidth="md"
         fullWidth
         PaperProps={{
-          sx: {
-            borderRadius: 2,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-          }
+          className: "rounded-lg"
         }}
       >
-        <DialogTitle sx={{ 
-          pb: 1,
-          borderBottom: 1,
-          borderColor: 'divider'
-        }}>
+        <DialogTitle className="border-b border-gray-200 px-6 py-4">
           {selectedProveedor ? 'Editar Proveedor' : 'Nuevo Proveedor'}
         </DialogTitle>
-        <DialogContent sx={{ pt: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Nombre"
-                name="nombre"
-                value={formData.nombre}
+        <DialogContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TextField
+              fullWidth
+              label="Nombre"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleInputChange}
+              required
+            />
+            <TextField
+              fullWidth
+              label="NIT"
+              name="nit"
+              value={formData.nit}
+              onChange={handleInputChange}
+              required
+            />
+            <TextField
+              fullWidth
+              label="Dirección"
+              name="direccion"
+              value={formData.direccion}
+              onChange={handleInputChange}
+              required
+              className="md:col-span-2"
+            />
+            <TextField
+              fullWidth
+              label="Teléfono"
+              name="telefono"
+              value={formData.telefono}
+              onChange={handleInputChange}
+              required
+            />
+            <TextField
+              fullWidth
+              label="Email"
+              name="email"
+              type="email"
+              value={formData.email}
+              onChange={handleInputChange}
+              required
+            />
+            <TextField
+              fullWidth
+              label="Nombre del Representante"
+              name="representante.nombre"
+              value={formData.representante.nombre}
+              onChange={handleInputChange}
+              required
+            />
+            <TextField
+              fullWidth
+              label="CI del Representante"
+              name="representante.ci"
+              value={formData.representante.ci}
+              onChange={handleInputChange}
+              required
+            />
+            <FormControl fullWidth required>
+              <InputLabel>Tipo de Servicio</InputLabel>
+              <Select
+                name="tipoServicio"
+                value={formData.tipoServicio}
                 onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="NIT"
-                name="nit"
-                value={formData.nit}
+                label="Tipo de Servicio"
+              >
+                <MenuItem value="materiales">Materiales</MenuItem>
+                <MenuItem value="equipos">Equipos</MenuItem>
+                <MenuItem value="servicios">Servicios</MenuItem>
+                <MenuItem value="otros">Otros</MenuItem>
+              </Select>
+            </FormControl>
+            <FormControl fullWidth required>
+              <InputLabel>Fundación</InputLabel>
+              <Select
+                name="fundacion"
+                value={formData.fundacion}
                 onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Dirección"
-                name="direccion"
-                value={formData.direccion}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Teléfono"
-                name="telefono"
-                value={formData.telefono}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Email"
-                name="email"
-                type="email"
-                value={formData.email}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Nombre del Representante"
-                name="representante.nombre"
-                value={formData.representante.nombre}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="CI del Representante"
-                name="representante.ci"
-                value={formData.representante.ci}
-                onChange={handleInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Tipo de Servicio</InputLabel>
-                <Select
-                  name="tipoServicio"
-                  value={formData.tipoServicio}
-                  onChange={handleInputChange}
-                  label="Tipo de Servicio"
-                >
-                  <MenuItem value="materiales">Materiales</MenuItem>
-                  <MenuItem value="equipos">Equipos</MenuItem>
-                  <MenuItem value="servicios">Servicios</MenuItem>
-                  <MenuItem value="otros">Otros</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Fundación</InputLabel>
-                <Select
-                  name="fundacion"
-                  value={formData.fundacion}
-                  onChange={handleInputChange}
-                  label="Fundación"
-                >
-                  {fundaciones.map((fundacion) => (
-                    <MenuItem key={fundacion._id} value={fundacion._id}>
-                      {fundacion.nombre}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+                label="Fundación"
+              >
+                {fundaciones.map((fundacion) => (
+                  <MenuItem key={fundacion._id} value={fundacion._id}>
+                    {fundacion.nombre}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </div>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button 
+        <DialogActions className="px-6 py-4 border-t border-gray-200">
+          <button
             onClick={handleCloseDialog}
-            sx={{ 
-              textTransform: 'none',
-              px: 3
-            }}
+            className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
           >
             Cancelar
-          </Button>
-          <Button 
-            onClick={handleSubmit} 
-            variant="contained"
-            sx={{ 
-              textTransform: 'none',
-              px: 3,
-              py: 1,
-              borderRadius: 2
-            }}
+          </button>
+          <button
+            onClick={handleSubmit}
+            className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
             {selectedProveedor ? 'Actualizar' : 'Crear'}
-          </Button>
+          </button>
         </DialogActions>
       </Dialog>
 
+      {/* Dialog Producto */}
       <Dialog 
         open={openProductDialog} 
-        onClose={handleCloseProductDialog} 
-        maxWidth="sm" 
+        onClose={handleCloseProductDialog}
+        maxWidth="sm"
         fullWidth
         PaperProps={{
-          sx: {
-            borderRadius: 2,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-          }
+          className: "rounded-lg"
         }}
       >
-        <DialogTitle sx={{ 
-          pb: 1,
-          borderBottom: 1,
-          borderColor: 'divider'
-        }}>
+        <DialogTitle className="border-b border-gray-200 px-6 py-4">
           {productoForm._id ? 'Editar Producto' : 'Nuevo Producto'}
         </DialogTitle>
-        <DialogContent sx={{ pt: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Nombre"
-                name="nombre"
-                value={productoForm.nombre}
+        <DialogContent className="p-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <TextField
+              fullWidth
+              label="Nombre"
+              name="nombre"
+              value={productoForm.nombre}
+              onChange={handleProductoInputChange}
+              required
+              className="md:col-span-2"
+            />
+            <TextField
+              fullWidth
+              label="Descripción"
+              name="descripcion"
+              value={productoForm.descripcion}
+              onChange={handleProductoInputChange}
+              multiline
+              rows={2}
+              className="md:col-span-2"
+            />
+            <TextField
+              fullWidth
+              label="Precio"
+              name="precio"
+              type="number"
+              value={productoForm.precio}
+              onChange={handleProductoInputChange}
+              required
+            />
+            <FormControl fullWidth required>
+              <InputLabel>Unidad</InputLabel>
+              <Select
+                name="unidad"
+                value={productoForm.unidad}
                 onChange={handleProductoInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Descripción"
-                name="descripcion"
-                value={productoForm.descripcion}
+                label="Unidad"
+              >
+                <MenuItem value="kg">Kilogramo (kg)</MenuItem>
+                <MenuItem value="unidad">Unidad</MenuItem>
+                <MenuItem value="litro">Litro</MenuItem>
+                <MenuItem value="metro">Metro</MenuItem>
+              </Select>
+            </FormControl>
+            <TextField
+              fullWidth
+              label="Stock"
+              name="stock"
+              type="number"
+              value={productoForm.stock}
+              onChange={handleProductoInputChange}
+              required
+            />
+            <FormControl fullWidth required>
+              <InputLabel>Categoría</InputLabel>
+              <Select
+                name="categoria"
+                value={productoForm.categoria}
                 onChange={handleProductoInputChange}
-                multiline
-                rows={2}
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Precio"
-                name="precio"
-                type="number"
-                value={productoForm.precio}
-                onChange={handleProductoInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Unidad</InputLabel>
-                <Select
-                  name="unidad"
-                  value={productoForm.unidad}
-                  onChange={handleProductoInputChange}
-                  label="Unidad"
-                >
-                  <MenuItem value="kg">Kilogramo (kg)</MenuItem>
-                  <MenuItem value="unidad">Unidad</MenuItem>
-                  <MenuItem value="litro">Litro</MenuItem>
-                  <MenuItem value="metro">Metro</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <TextField
-                fullWidth
-                label="Stock"
-                name="stock"
-                type="number"
-                value={productoForm.stock}
-                onChange={handleProductoInputChange}
-                required
-              />
-            </Grid>
-            <Grid item xs={12} md={6}>
-              <FormControl fullWidth required>
-                <InputLabel>Categoría</InputLabel>
-                <Select
-                  name="categoria"
-                  value={productoForm.categoria}
-                  onChange={handleProductoInputChange}
-                  label="Categoría"
-                >
-                  <MenuItem value="materiales">Materiales</MenuItem>
-                  <MenuItem value="equipos">Equipos</MenuItem>
-                  <MenuItem value="servicios">Servicios</MenuItem>
-                  <MenuItem value="otros">Otros</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+                label="Categoría"
+              >
+                <MenuItem value="materiales">Materiales</MenuItem>
+                <MenuItem value="equipos">Equipos</MenuItem>
+                <MenuItem value="servicios">Servicios</MenuItem>
+                <MenuItem value="otros">Otros</MenuItem>
+              </Select>
+            </FormControl>
+          </div>
         </DialogContent>
-        <DialogActions sx={{ p: 3, pt: 1 }}>
-          <Button 
+        <DialogActions className="px-6 py-4 border-t border-gray-200">
+          <button
             onClick={handleCloseProductDialog}
-            sx={{ 
-              textTransform: 'none',
-              px: 3
-            }}
+            className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
           >
             Cancelar
-          </Button>
-          <Button 
-            onClick={handleProductoSubmit} 
-            variant="contained"
-            sx={{ 
-              textTransform: 'none',
-              px: 3,
-              py: 1,
-              borderRadius: 2
-            }}
+          </button>
+          <button
+            onClick={handleProductoSubmit}
+            className="px-4 py-2 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
           >
             {productoForm._id ? 'Actualizar' : 'Agregar'}
-          </Button>
+          </button>
         </DialogActions>
       </Dialog>
 
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={6000}
-        onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
-      >
-        <Alert
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-          severity={snackbar.severity}
-          sx={{ 
-            width: '100%',
-            borderRadius: 2,
-            boxShadow: '0 4px 20px rgba(0,0,0,0.1)'
-          }}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
-    </Box>
+      {/* Snackbar */}
+      {snackbar.open && (
+        <div className={`fixed bottom-4 right-4 px-4 py-3 rounded-lg shadow-lg ${
+          snackbar.severity === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+        }`}>
+          <p className="text-sm font-medium">{snackbar.message}</p>
+        </div>
+      )}
+    </div>
   );
 };
 
