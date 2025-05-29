@@ -1,14 +1,37 @@
 import Producto from '../models/Producto.model.js';
 import Proveedor from '../models/Proveedor.model.js';
+import { cloudinary } from '../config/cloudinary.js';
+import { upload } from '../config/cloudinary.js';
 
 // Crear un nuevo producto
 export const crearProducto = async (req, res) => {
   try {
     const { nombre, descripcion, precio, unidad, stock, categoria, proveedor } = req.body;
-    const fundacion = req.user.entidadRelacionada;
+    let imagenes = [];
+    if (req.file) {
+      imagenes.push({
+        url: req.file.path,
+        public_id: req.file.filename
+      });
+    }
+    
+    // Obtener la fundación según el rol del usuario
+    let fundacion;
+    if (req.user.rol === 'fundacion') {
+      fundacion = req.user.entidadRelacionada;
+    } else if (req.user.rol === 'proveedor') {
+      // Si es proveedor, obtener su fundación asociada
+      const proveedorDoc = await Proveedor.findById(req.user.entidadRelacionada);
+      if (!proveedorDoc) {
+        return res.status(400).json({ message: 'Proveedor no encontrado' });
+      }
+      fundacion = proveedorDoc.fundacion;
+    } else {
+      return res.status(403).json({ message: 'No tiene permisos para crear productos' });
+    }
 
     // Validar campos requeridos
-    if (!nombre || !descripcion || !precio || !unidad || !stock || !categoria || !proveedor) {
+    if (!nombre || !descripcion || !precio || !unidad || !stock || !categoria) {
       return res.status(400).json({
         message: 'Todos los campos son requeridos',
         errores: {
@@ -17,15 +40,17 @@ export const crearProducto = async (req, res) => {
           precio: !precio ? 'El precio es requerido' : null,
           unidad: !unidad ? 'La unidad es requerida' : null,
           stock: !stock ? 'El stock es requerido' : null,
-          categoria: !categoria ? 'La categoría es requerida' : null,
-          proveedor: !proveedor ? 'El proveedor es requerido' : null
+          categoria: !categoria ? 'La categoría es requerida' : null
         }
       });
     }
 
+    // Si es proveedor, usar su ID como proveedor
+    const proveedorId = req.user.rol === 'proveedor' ? req.user.entidadRelacionada : proveedor;
+
     // Verificar que el proveedor existe y pertenece a la fundación
     const proveedorExiste = await Proveedor.findOne({
-      _id: proveedor,
+      _id: proveedorId,
       fundacion: fundacion
     });
 
@@ -48,8 +73,9 @@ export const crearProducto = async (req, res) => {
       unidad,
       stock: Number(stock),
       categoria,
-      proveedor,
-      fundacion
+      proveedor: proveedorId,
+      fundacion,
+      imagenes
     });
 
     res.status(201).json(producto);
@@ -172,22 +198,30 @@ export const actualizarProducto = async (req, res) => {
 // Eliminar un producto
 export const eliminarProducto = async (req, res) => {
   try {
-    const fundacion = req.user.entidadRelacionada;
-    const producto = await Producto.findOneAndDelete({
-      _id: req.params.id,
-      fundacion
-    });
+    let query = { _id: req.params.id };
+
+    // Permitir que fundaciones eliminen productos de su fundación
+    if (req.user.rol === 'fundacion') {
+      query.fundacion = req.user.entidadRelacionada;
+    }
+    // Permitir que proveedores eliminen productos que ellos crearon
+    else if (req.user.rol === 'proveedor') {
+      query.proveedor = req.user.entidadRelacionada;
+    } else {
+      return res.status(403).json({ message: 'No tiene permisos para eliminar productos' });
+    }
+
+    const producto = await Producto.findOneAndDelete(query);
 
     if (!producto) {
-      return res.status(404).json({ message: 'Producto no encontrado' });
+      return res.status(404).json({ message: 'Producto no encontrado o no tiene permisos para eliminarlo' });
     }
 
     res.json({ message: 'Producto eliminado correctamente' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
-}; 
-
+};
 
 //Obtener todos los productos 
 
@@ -212,6 +246,80 @@ export const obtenerTodosProductosdef = async (req, res) => {
     return res.json(productos);
   } catch (error) {
     console.error('Error en obtenerTodosProductos:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Obtener productos por proveedor
+export const obtenerProductosProveedor = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ message: 'Usuario no autenticado' });
+    }
+
+    // Si el usuario es proveedor, obtener sus productos
+    if (req.user.rol === 'proveedor') {
+      const productos = await Producto.find({ 
+        proveedor: req.user.entidadRelacionada,
+        estado: 'activo'
+      }).sort({ createdAt: -1 });
+      return res.json(productos);
+    }
+
+    // Si no es proveedor, no tiene acceso
+    return res.status(403).json({ message: 'No tiene permisos para ver estos productos' });
+  } catch (error) {
+    console.error('Error al obtener productos del proveedor:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Subir imagen de producto
+export const subirImagenProducto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No se ha subido ninguna imagen' });
+    }
+
+    const producto = await Producto.findById(req.params.id);
+    if (!producto) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    // Agregar la nueva imagen al array de imágenes
+    producto.imagenes.push({
+      url: req.file.path,
+      public_id: req.file.filename
+    });
+
+    await producto.save();
+    res.json(producto);
+  } catch (error) {
+    console.error('Error al subir imagen:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Eliminar imagen de producto
+export const eliminarImagenProducto = async (req, res) => {
+  try {
+    const { productoId, publicId } = req.params;
+    
+    const producto = await Producto.findById(productoId);
+    if (!producto) {
+      return res.status(404).json({ message: 'Producto no encontrado' });
+    }
+
+    // Eliminar la imagen de Cloudinary
+    await cloudinary.uploader.destroy(publicId);
+
+    // Eliminar la imagen del array de imágenes del producto
+    producto.imagenes = producto.imagenes.filter(img => img.public_id !== publicId);
+    await producto.save();
+
+    res.json({ message: 'Imagen eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar imagen:', error);
     res.status(500).json({ message: error.message });
   }
 };

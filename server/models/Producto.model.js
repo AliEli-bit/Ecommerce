@@ -30,6 +30,10 @@ const productoSchema = new mongoose.Schema({
     required: true,
     enum: ['materiales', 'equipos','alimentos','gaseosas', 'otros']
   },
+  imagenes: [{
+    url: String,
+    public_id: String
+  }],
   proveedor: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Proveedor',
