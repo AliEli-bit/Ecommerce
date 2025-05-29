@@ -54,7 +54,16 @@ const proveedorSchema = new mongoose.Schema({
     default: true
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+// Referencia virtual a los productos del proveedor
+proveedorSchema.virtual('productos', {
+  ref: 'Producto',
+  localField: '_id',
+  foreignField: 'proveedor'
 });
 
 // Verificar si el modelo ya existe antes de crearlo

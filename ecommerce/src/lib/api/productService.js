@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5002/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5003/api';
 
 /**
  * Servicio para gestionar las operaciones de API relacionadas con productos

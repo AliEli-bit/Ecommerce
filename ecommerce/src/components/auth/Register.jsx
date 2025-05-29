@@ -4,6 +4,7 @@ import { Mail, Lock, User, Loader2, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
+import api from "../../lib/api";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -34,11 +35,35 @@ export default function Register() {
     setLoading(true);
     
     try {
-      // Simulación de registro
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      navigate("/login");
+      // Llamada a la API para registrar usuario
+      const response = await api.post('/usuarios/registro', {
+        nombre: formData.name,
+        email: formData.email,
+        password: formData.password,
+        rol: 'usuario' // Por defecto, registramos como usuario normal
+      });
+      
+      // Si el registro es exitoso, redirigir al login
+      if (response.data) {
+        navigate("/login");
+      }
     } catch (err) {
-      setError("Error al crear la cuenta. Intenta de nuevo.");
+      console.error('Error de registro:', err);
+      
+      if (err.response) {
+        // Error de respuesta del servidor
+        if (err.response.data && err.response.data.message) {
+          setError(err.response.data.message);
+        } else {
+          setError(`Error del servidor: ${err.response.status}`);
+        }
+      } else if (err.request) {
+        // Error de conexión
+        setError("No se pudo conectar con el servidor. Verifica tu conexión a internet.");
+      } else {
+        // Error en la configuración de la solicitud
+        setError("Error al crear la cuenta. Intenta de nuevo más tarde.");
+      }
     } finally {
       setLoading(false);
     }

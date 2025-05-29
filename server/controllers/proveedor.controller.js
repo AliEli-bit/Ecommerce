@@ -1,5 +1,6 @@
 import Proveedor from '../models/Proveedor.model.js';
 import Fundacion from '../models/Fundacion.model.js';
+import Usuario from '../models/Usuario.model.js';
 
 // Crear un nuevo proveedor
 export const crearProveedor = async (req, res) => {
@@ -10,6 +11,7 @@ export const crearProveedor = async (req, res) => {
       direccion,
       telefono,
       email,
+      password,
       representante,
       tipoServicio,
       fundacion
@@ -22,6 +24,7 @@ export const crearProveedor = async (req, res) => {
       direccion: !direccion || direccion.trim() === '',
       telefono: !telefono || telefono.trim() === '',
       email: !email || email.trim() === '',
+      password: !password || password.trim() === '',
       representante: !representante,
       'representante.nombre': !representante?.nombre || representante.nombre.trim() === '',
       'representante.ci': !representante?.ci || representante.ci.trim() === '',
@@ -41,6 +44,7 @@ export const crearProveedor = async (req, res) => {
             case 'direccion': return 'Dirección';
             case 'telefono': return 'Teléfono';
             case 'email': return 'Email';
+            case 'password': return 'Contraseña';
             case 'representante.nombre': return 'Nombre del representante';
             case 'representante.ci': return 'CI del representante';
             case 'tipoServicio': return 'Tipo de servicio';
@@ -74,6 +78,12 @@ export const crearProveedor = async (req, res) => {
       });
     }
 
+    // Verificar si ya existe un usuario con el mismo email
+    const usuarioExistente = await Usuario.findOne({ email });
+    if (usuarioExistente) {
+      return res.status(400).json({ message: 'Ya existe un usuario con este email' });
+    }
+
     // Crear el proveedor
     const proveedor = await Proveedor.create({
       nombre,
@@ -87,7 +97,22 @@ export const crearProveedor = async (req, res) => {
       estado: 'pendiente'
     });
 
-    res.status(201).json(proveedor);
+    // Crear el usuario asociado al proveedor usando la contraseña proporcionada
+    const usuario = await Usuario.create({
+      nombre: representante.nombre,
+      email,
+      password,
+      rol: 'proveedor',
+      entidadRelacionada: proveedor._id,
+      rolModel: 'Proveedor'
+    });
+
+    res.status(201).json({
+      ...proveedor.toObject(),
+      credenciales: {
+        email
+      }
+    });
   } catch (error) {
     if (error.name === 'ValidationError') {
       return res.status(400).json({
@@ -119,6 +144,7 @@ export const obtenerProveedores = async (req, res) => {
 
     const proveedores = await Proveedor.find(query)
       .populate('fundacion', 'nombre')
+      .populate('productos')
       .sort({ createdAt: -1 });
     
     res.json(proveedores);

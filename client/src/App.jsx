@@ -9,6 +9,7 @@ import Login from './pages/Login';
 import Unauthorized from './pages/Unauthorized';
 import AdminDashboard from './pages/admin/Dashboard';
 import FundacionDashboard from './pages/fundacion/Dashboard';
+import ProveedorDashboard from './pages/proveedor/Dashboard';
 import Proveedores from './pages/admin/Proveedores';
 import Fundaciones from './pages/admin/Fundaciones';
 import Reportes from './pages/admin/Reportes';
@@ -83,6 +84,19 @@ const App = () => {
                   <Routes>
                     <Route path="dashboard" element={<FundacionDashboard />} />
                     <Route path="*" element={<Navigate to="/fundacion/dashboard" replace />} />
+                  </Routes>
+                </PrivateRoute>
+              }
+            />
+
+            {/* Rutas protegidas - Proveedor */}
+            <Route
+              path="/proveedor/*"
+              element={
+                <PrivateRoute allowedRoles={['proveedor']}>
+                  <Routes>
+                    <Route path="dashboard" element={<ProveedorDashboard />} />
+                    <Route path="*" element={<Navigate to="/proveedor/dashboard" replace />} />
                   </Routes>
                 </PrivateRoute>
               }

@@ -84,6 +84,7 @@ const Proveedores = () => {
     direccion: '',
     telefono: '',
     email: '',
+    password: '',
     representante: {
       nombre: '',
       ci: ''
@@ -150,6 +151,7 @@ const Proveedores = () => {
         direccion: '',
         telefono: '',
         email: '',
+        password: '',
         representante: {
           nombre: '',
           ci: ''
@@ -607,6 +609,16 @@ const Proveedores = () => {
               value={formData.email}
               onChange={handleInputChange}
               required
+            />
+            <TextField
+              fullWidth
+              label="Contraseña"
+              name="password"
+              type="password"
+              value={formData.password}
+              onChange={handleInputChange}
+              required={!selectedProveedor}
+              helperText={selectedProveedor ? "Dejar en blanco para mantener la contraseña actual" : ""}
             />
             <TextField
               fullWidth

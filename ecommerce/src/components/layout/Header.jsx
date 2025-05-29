@@ -34,7 +34,7 @@ export default function Header() {
           <Link to="/login" className="hidden md:block">
             <Button>Iniciar Sesión</Button>
           </Link>
-          <Link to="/login" className="hidden md:block">
+          <Link to="/register" className="hidden md:block">
             <Button>Registarme</Button>
           </Link>
           <Button variant="outline" size="icon" className="md:hidden">
