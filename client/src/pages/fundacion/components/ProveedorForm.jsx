@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -17,6 +17,7 @@ import {
   InputAdornment,
   IconButton,
   Tooltip,
+  Alert,
 } from '@mui/material';
 import {
   Business as BusinessIcon,
@@ -28,6 +29,7 @@ import {
   Info as InfoIcon,
   Store as StoreIcon,
 } from '@mui/icons-material';
+import { useAuth } from '../../../context/AuthContext';
 
 const tiposServicio = [
   'Alimentos',
@@ -39,7 +41,8 @@ const tiposServicio = [
 ];
 
 const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
-  const [formData, setFormData] = React.useState({
+  const { user } = useAuth();
+  const [formData, setFormData] = useState({
     nombre: '',
     nit: '',
     direccion: '',
@@ -51,28 +54,54 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
       ci: ''
     },
     tipoServicio: '',
+    fundacion: user?.entidadRelacionada || '',
     ...initialData
   });
 
-  const [errors, setErrors] = React.useState({});
+  const [errors, setErrors] = useState({});
+  const [submitError, setSubmitError] = useState('');
+
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+    } else {
+      setFormData({
+        nombre: '',
+        nit: '',
+        direccion: '',
+        telefono: '',
+        email: '',
+        password: '',
+        representante: {
+          nombre: '',
+          ci: ''
+        },
+        tipoServicio: '',
+        fundacion: user?.entidadRelacionada || ''
+      });
+    }
+    setErrors({});
+    setSubmitError('');
+  }, [initialData, open, user]);
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.nombre) newErrors.nombre = 'El nombre es requerido';
-    if (!formData.nit) newErrors.nit = 'El NIT es requerido';
-    if (!formData.direccion) newErrors.direccion = 'La dirección es requerida';
-    if (!formData.telefono) newErrors.telefono = 'El teléfono es requerido';
-    if (!formData.email) {
+    if (!formData.nombre?.trim()) newErrors.nombre = 'El nombre es requerido';
+    if (!formData.nit?.trim()) newErrors.nit = 'El NIT es requerido';
+    if (!formData.direccion?.trim()) newErrors.direccion = 'La dirección es requerida';
+    if (!formData.telefono?.trim()) newErrors.telefono = 'El teléfono es requerido';
+    if (!formData.email?.trim()) {
       newErrors.email = 'El email es requerido';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido';
     }
-    if (!initialData && !formData.password) {
+    if (!initialData && !formData.password?.trim()) {
       newErrors.password = 'La contraseña es requerida para nuevos proveedores';
     }
-    if (!formData.tipoServicio) newErrors.tipoServicio = 'El tipo de servicio es requerido';
-    if (!formData.representante.nombre) newErrors['representante.nombre'] = 'El nombre del representante es requerido';
-    if (!formData.representante.ci) newErrors['representante.ci'] = 'La cédula del representante es requerida';
+    if (!formData.tipoServicio?.trim()) newErrors.tipoServicio = 'El tipo de servicio es requerido';
+    if (!formData.representante?.nombre?.trim()) newErrors['representante.nombre'] = 'El nombre del representante es requerido';
+    if (!formData.representante?.ci?.trim()) newErrors['representante.ci'] = 'La cédula del representante es requerida';
+    if (!formData.fundacion) newErrors.fundacion = 'La fundación es requerida';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -104,11 +133,23 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setSubmitError('');
+    
     if (validateForm()) {
-      onSubmit(formData);
-      onClose();
+      try {
+        // Asegurarse de que la fundación esté incluida en los datos
+        const submitData = {
+          ...formData,
+          fundacion: user?.entidadRelacionada
+        };
+        await onSubmit(submitData);
+        onClose();
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        setSubmitError(error.response?.data?.message || 'Error al guardar el proveedor');
+      }
     }
   };
 
@@ -132,6 +173,11 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
       </DialogTitle>
       <form onSubmit={handleSubmit}>
         <DialogContent className="bg-white">
+          {submitError && (
+            <Alert severity="error" className="mb-4">
+              {submitError}
+            </Alert>
+          )}
           <Grid container spacing={3}>
             {/* Información de la Empresa */}
             <Grid item xs={12}>
@@ -307,7 +353,7 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
               <TextField
                 name="representante.nombre"
                 label="Nombre del Representante"
-                value={formData.representante.nombre}
+                value={formData.representante?.nombre || ''}
                 onChange={handleChange}
                 fullWidth
                 required
@@ -326,7 +372,7 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
               <TextField
                 name="representante.ci"
                 label="Cédula de Identidad"
-                value={formData.representante.ci}
+                value={formData.representante?.ci || ''}
                 onChange={handleChange}
                 fullWidth
                 required

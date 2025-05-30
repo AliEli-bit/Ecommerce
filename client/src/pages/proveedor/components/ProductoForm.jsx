@@ -105,8 +105,8 @@ const ProductoForm = ({
         // Cerrar el formulario después de editar
         handleClose();
       } else {
-        // Crear nuevo producto
-        await onAddProducto(formData);
+        // Crear nuevo producto con imagen si existe
+        await onAddProducto(formData, imagenFile);
       }
       
     } catch (err) {
@@ -166,17 +166,11 @@ const ProductoForm = ({
     if (isEditing) {
       return `Editar Producto: ${selectedProducto.nombre}`;
     }
-    if (!productoCreado) {
-      return 'Nuevo Producto - Paso 1: Datos';
-    }
-    return 'Nuevo Producto - Paso 2: Imagen';
+    return 'Nuevo Producto';
   };
 
-  // Determinar si mostrar el formulario de datos
-  const showDataForm = isEditing || !productoCreado;
-
-  // Determinar si mostrar la sección de imagen
-  const showImageSection = isEditing || productoCreado;
+  const showDataForm = true; 
+  const showImageSection = true; 
 
   return (
     <Dialog open={open} onClose={handleClose} maxWidth="sm" fullWidth>

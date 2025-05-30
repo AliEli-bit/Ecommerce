@@ -70,11 +70,13 @@ const Dashboard = () => {
   };
 
   const handleOpenProveedorForm = (proveedor = null) => {
+    console.log('Abriendo formulario de proveedor:', proveedor);
     setSelectedProveedor(proveedor);
     setOpenProveedorForm(true);
   };
 
   const handleCloseProveedorForm = () => {
+    console.log('Cerrando formulario de proveedor');
     setOpenProveedorForm(false);
     setSelectedProveedor(null);
   };
@@ -87,11 +89,18 @@ const Dashboard = () => {
     }
   };
 
-  const handleSubmitProveedor = (proveedorData) => {
-    if (selectedProveedor) {
-      handleEditProveedor(selectedProveedor._id, proveedorData);
-    } else {
-      handleAddProveedor(proveedorData);
+  const handleSubmitProveedor = async (proveedorData) => {
+    try {
+      console.log('Enviando datos del proveedor:', proveedorData);
+      if (selectedProveedor) {
+        await handleEditProveedor(selectedProveedor._id, proveedorData);
+      } else {
+        await handleAddProveedor(proveedorData);
+      }
+      handleCloseProveedorForm();
+    } catch (error) {
+      console.error('Error al guardar proveedor:', error);
+      // Aquí podrías mostrar un mensaje de error al usuario
     }
   };
 

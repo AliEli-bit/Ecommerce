@@ -96,15 +96,24 @@ const Dashboard = () => {
   };
 
   // Manejar la creación del producto (solo datos)
-  const handleCreateProducto = async (productoData) => {
+  const handleCreateProducto = async (productoData, imagenFile) => {
     try {
       console.log('Creando producto con datos:', productoData);
       const nuevoProducto = await handleAddProducto(productoData);
-      setProductoCreado(nuevoProducto);
-      showSnackbar('Producto creado correctamente. Ahora puede agregar una imagen.');
+      
+      // Si hay una imagen, subirla inmediatamente
+      if (imagenFile) {
+        await handleUploadImagen(nuevoProducto._id, imagenFile);
+        showSnackbar('Producto creado e imagen subida correctamente');
+      } else {
+        showSnackbar('Producto creado correctamente');
+      }
       
       // Refrescar la lista de productos
       await refreshProductos();
+      
+      // Cerrar el formulario
+      handleCloseProductoForm();
     } catch (error) {
       console.error('Error al crear producto:', error);
       showSnackbar(error.response?.data?.message || 'Error al crear el producto', 'error');

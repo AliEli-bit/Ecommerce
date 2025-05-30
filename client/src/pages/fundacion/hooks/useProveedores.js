@@ -1,16 +1,5 @@
 import { useState, useEffect } from 'react';
-import axios from 'axios';
-
-const API_URL = 'http://localhost:5003/api';
-
-// Configurar axios para incluir el token en todas las peticiones
-axios.interceptors.request.use((config) => {
-  const token = localStorage.getItem('token');
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+import axios from '../../../config/axios';
 
 export const useProveedores = () => {
   const [proveedores, setProveedores] = useState([]);
@@ -23,12 +12,7 @@ export const useProveedores = () => {
       setLoading(true);
       setError(null);
       
-      const response = await axios.get(`${API_URL}/proveedores`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
+      const response = await axios.get('/proveedores');
       console.log('Proveedores response:', response.data);
       
       if (response.data && Array.isArray(response.data)) {
@@ -40,7 +24,6 @@ export const useProveedores = () => {
     } catch (err) {
       console.error('Error details:', err.response || err);
       if (err.response) {
-        // El servidor respondió con un código de error
         if (err.response.status === 401) {
           setError('No autorizado. Por favor, inicie sesión nuevamente.');
         } else if (err.response.status === 403) {
@@ -49,10 +32,8 @@ export const useProveedores = () => {
           setError(err.response.data?.message || 'Error al cargar los proveedores');
         }
       } else if (err.request) {
-        // La petición fue hecha pero no se recibió respuesta
         setError('No se pudo conectar con el servidor');
       } else {
-        // Error al configurar la petición
         setError('Error al procesar la solicitud');
       }
     } finally {
@@ -70,12 +51,7 @@ export const useProveedores = () => {
       console.log('Adding proveedor:', proveedorData);
       setError(null);
       
-      const response = await axios.post(`${API_URL}/proveedores`, proveedorData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
+      const response = await axios.post('/proveedores', proveedorData);
       console.log('Add proveedor response:', response.data);
       
       if (response.data) {
@@ -100,12 +76,7 @@ export const useProveedores = () => {
       console.log('Editing proveedor:', id, proveedorData);
       setError(null);
       
-      const response = await axios.put(`${API_URL}/proveedores/${id}`, proveedorData, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
+      const response = await axios.put(`/proveedores/${id}`, proveedorData);
       console.log('Edit proveedor response:', response.data);
       
       if (response.data) {
@@ -130,12 +101,7 @@ export const useProveedores = () => {
       console.log('Deleting proveedor:', id);
       setError(null);
       
-      await axios.delete(`${API_URL}/proveedores/${id}`, {
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-      
+      await axios.delete(`/proveedores/${id}`);
       setProveedores(prev => prev.filter(p => p._id !== id));
     } catch (err) {
       console.error('Error deleting proveedor:', err.response || err);
