@@ -99,9 +99,26 @@ export const useProducts = () => {
     }
   }
 
+  // ✅ FUNCIÓN CORREGIDA - Evita duplicados y maneja cantidades correctamente
   const handleAddToCart = (product) => {
-    setCart([...cart, { ...product, quantity: 1 }])
-    showNotification(`${product.name} agregado al carrito`)
+    // Verificar si el producto ya está en el carrito
+    const existingProductIndex = cart.findIndex(item => item.id === product.id);
+    
+    if (existingProductIndex !== -1) {
+      // Si ya existe, incrementar la cantidad
+      const updatedCart = [...cart];
+      updatedCart[existingProductIndex] = {
+        ...updatedCart[existingProductIndex],
+        quantity: updatedCart[existingProductIndex].quantity + 1
+      };
+      setCart(updatedCart);
+      showNotification(`Cantidad de ${product.name} actualizada en el carrito`);
+    } else {
+      // Si no existe, agregarlo con cantidad 1
+      const newCartItem = { ...product, quantity: 1 };
+      setCart(prevCart => [...prevCart, newCartItem]);
+      showNotification(`${product.name} agregado al carrito`);
+    }
   }
 
   const handleToggleFavorite = (product) => {
@@ -127,6 +144,25 @@ export const useProducts = () => {
     showNotification(`${removed[0].name} eliminado del carrito`)
   }
 
+  // ✅ NUEVA FUNCIÓN - Actualizar cantidad de un producto en el carrito
+  const handleUpdateQuantity = (productId, newQuantity) => {
+    if (newQuantity <= 0) {
+      // Si la cantidad es 0 o menor, remover del carrito
+      const productIndex = cart.findIndex(item => item.id === productId);
+      if (productIndex !== -1) {
+        handleRemoveFromCart(productIndex);
+      }
+      return;
+    }
+
+    const updatedCart = cart.map(item => 
+      item.id === productId 
+        ? { ...item, quantity: newQuantity }
+        : item
+    );
+    setCart(updatedCart);
+  }
+
   const clearFilters = () => {
     setSelectedCategory('todos')
     setPriceRange('todos')
@@ -147,9 +183,10 @@ export const useProducts = () => {
     handleAddToCart,
     handleToggleFavorite,
     handleRemoveFromCart,
+    handleUpdateQuantity, // ✅ Nueva función exportada
     setIsCartOpen,
     setSelectedCategory,
     setPriceRange,
     clearFilters
   }
-} 
+}

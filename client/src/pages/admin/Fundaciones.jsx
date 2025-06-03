@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Dialog,
@@ -18,181 +18,25 @@ import {
   Phone as PhoneIcon,
   Email as EmailIcon,
 } from '@mui/icons-material';
-import axios from 'axios';
-
-const API_URL = '/api';
-
-const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
-  <div 
-    className={`bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition-all duration-300 transform hover:-translate-y-1`}
-  >
-    <div className="flex justify-between items-start">
-      <div>
-        <p className="text-gray-600 text-sm font-medium mb-1">{title}</p>
-        <h3 className="text-3xl font-bold text-gray-900 mb-2">{value}</h3>
-        {subtitle && (
-          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-${color}-100 text-${color}-800`}>
-            {subtitle}
-          </span>
-        )}
-      </div>
-      <div className={`p-3 rounded-lg bg-${color}-100`}>
-        <Icon className={`w-6 h-6 text-${color}-600`} />
-      </div>
-    </div>
-  </div>
-);
+import { useFundaciones } from './hooks/useFundaciones';
+import StatCard from './components/StatCard';
 
 const Fundaciones = () => {
   const navigate = useNavigate();
-  const [fundaciones, setFundaciones] = useState([]);
-  const [openDialog, setOpenDialog] = useState(false);
-  const [editingFundacion, setEditingFundacion] = useState(null);
-  const [formData, setFormData] = useState({
-    nombre: '',
-    nit: '',
-    direccion: '',
-    telefono: '',
-    email: '',
-    representante: {
-      nombre: '',
-      ci: ''
-    },
-    mision: '',
-    areaAccion: '',
-    cuentaBancaria: '',
-    logo: '',
-    descripcion: '',
-    password: '',
-  });
-  const [errors, setErrors] = useState({});
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success',
-  });
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    fetchFundaciones();
-  }, []);
-
-  const fetchFundaciones = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(`${API_URL}/fundaciones`);
-      setFundaciones(response.data);
-    } catch (error) {
-      showSnackbar('Error al cargar las fundaciones', 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOpenDialog = (fundacion = null) => {
-    if (fundacion) {
-      setFormData(fundacion);
-      setEditingFundacion(fundacion);
-    } else {
-      setFormData({
-        nombre: '',
-        nit: '',
-        direccion: '',
-        telefono: '',
-        email: '',
-        representante: {
-          nombre: '',
-          ci: ''
-        },
-        mision: '',
-        areaAccion: '',
-        cuentaBancaria: '',
-        logo: '',
-        descripcion: '',
-        password: '',
-      });
-      setEditingFundacion(null);
-    }
-    setOpenDialog(true);
-  };
-
-  const handleCloseDialog = () => {
-    setOpenDialog(false);
-    setEditingFundacion(null);
-    setErrors({});
-  };
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name.includes('.')) {
-      const [parent, child] = name.split('.');
-      setFormData(prev => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent],
-          [child]: value
-        }
-      }));
-    } else {
-      setFormData(prev => ({
-        ...prev,
-        [name]: value
-      }));
-    }
-    if (errors[name]) {
-      setErrors(prev => ({ ...prev, [name]: false }));
-    }
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErrors({});
-    try {
-      if (editingFundacion) {
-        await axios.put(`${API_URL}/fundaciones/${editingFundacion._id}`, formData);
-        showSnackbar('Fundación actualizada correctamente');
-      } else {
-        const response = await axios.post(`${API_URL}/fundaciones`, formData);
-        showSnackbar(
-          `Fundación creada correctamente. Credenciales de acceso: Email: ${response.data.usuario.email}, Contraseña: ${formData.password}`,
-          'success',
-          10000
-        );
-      }
-      handleCloseDialog();
-      fetchFundaciones();
-    } catch (error) {
-      if (error.response?.data?.camposFaltantes) {
-        setErrors(error.response.data.camposFaltantes);
-        showSnackbar('Por favor complete todos los campos requeridos', 'error');
-      } else if (error.response?.data?.errores) {
-        setErrors(error.response.data.errores);
-        showSnackbar('Error de validación', 'error');
-      } else {
-        showSnackbar(error.response?.data?.message || 'Error al guardar la fundación', 'error');
-      }
-    }
-  };
-
-  const handleDelete = async (id) => {
-    if (window.confirm('¿Está seguro de eliminar esta fundación?')) {
-      try {
-        await axios.delete(`${API_URL}/fundaciones/${id}`);
-        showSnackbar('Fundación eliminada correctamente');
-        fetchFundaciones();
-      } catch (error) {
-        showSnackbar('Error al eliminar la fundación', 'error');
-      }
-    }
-  };
-
-  const showSnackbar = (message, severity = 'success') => {
-    setSnackbar({
-      open: true,
-      message,
-      severity,
-    });
-  };
+  const {
+    fundaciones,
+    openDialog,
+    editingFundacion,
+    formData,
+    errors,
+    snackbar,
+    loading,
+    handleOpenDialog,
+    handleCloseDialog,
+    handleInputChange,
+    handleSubmit,
+    handleDelete,
+  } = useFundaciones();
 
   if (loading) {
     return (

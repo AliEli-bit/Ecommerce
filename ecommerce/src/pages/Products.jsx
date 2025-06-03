@@ -1,30 +1,39 @@
-"use client"
-
-import { Heart, ShoppingCart, Filter } from "lucide-react"
-import Cart from "./ui/cart"
-import { useProducts } from "../hooks/useProducts"
+// ecommerce/src/pages/Products.jsx (versión actualizada)
+import { Heart, ShoppingCart, Filter, Plus, Check, History } from "lucide-react";
+import { useProducts } from "../hooks/useProducts";
+import { useCarritoAvanzado } from "../hooks/useCarritoAvanzado";
+import { Button } from "../components/ui/button";
+import CarritoMejorado from "../components/carrito/CarritoMejorado";
+import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 
 const Products = () => {
   const {
     products,
     loading,
     error,
-    cart,
-    notification,
-    isCartOpen,
     selectedCategory,
     priceRange,
     categories,
     priceRanges,
     fetchProducts,
-    handleAddToCart,
-    handleToggleFavorite,
-    handleRemoveFromCart,
-    setIsCartOpen,
     setSelectedCategory,
     setPriceRange,
     clearFilters
-  } = useProducts()
+  } = useProducts();
+
+  const {
+    cantidadItems,
+    setIsCartOpen,
+    agregarConNotificacion,
+    estaEnCarrito,
+    getCantidadEnCarrito,
+    actualizarCantidad
+  } = useCarritoAvanzado();
+
+  const handleAddToCart = async (product) => {
+    await agregarConNotificacion(product, 1);
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -34,17 +43,7 @@ const Products = () => {
           <h1 className="text-2xl font-bold text-[#0f172a]">
             Productos
           </h1>
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="relative p-2 text-[#0f172a] hover:bg-gray-100 rounded-full transition"
-          >
-            <ShoppingCart className="w-6 h-6" />
-            {cart.length > 0 && (
-              <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                {cart.length}
-              </span>
-            )}
-          </button>
+          
         </div>
       </header>
 
@@ -79,6 +78,16 @@ const Products = () => {
                   </option>
                 ))}
               </select>
+              {(selectedCategory !== 'todos' || priceRange !== 'todos') && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="text-sm"
+                >
+                  Limpiar filtros
+                </Button>
+              )}
             </div>
           </div>
         </div>
@@ -86,76 +95,190 @@ const Products = () => {
 
       {/* Main Content */}
       <div className="px-4 py-6">
-        {notification && (
-          <div className="fixed top-20 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
-            {notification}
-          </div>
-        )}
-
         <div className="max-w-7xl mx-auto">
           {loading ? (
-            <div className="flex justify-center">
+            <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0f172a]"></div>
             </div>
           ) : error ? (
-            <div className="text-center text-red-500">
-              <p>{error}</p>
-              <button onClick={fetchProducts} className="mt-4 px-4 py-2 bg-[#0f172a] text-white rounded hover:bg-[#1e293b] transition">
+            <div className="text-center text-red-500 bg-white rounded-lg shadow-sm p-8">
+              <p className="text-xl mb-4">{error}</p>
+              <Button onClick={fetchProducts} className="bg-[#0f172a] text-white hover:bg-[#1e293b]">
                 Reintentar
-              </button>
+              </Button>
             </div>
           ) : products.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-lg shadow-sm">
               <p className="text-xl text-gray-600 mb-4">No hay productos disponibles con los filtros seleccionados</p>
-              <button
+              <Button
                 onClick={clearFilters}
-                className="text-[#0f172a] hover:text-[#1e293b] transition"
+                variant="outline"
+                className="text-[#0f172a] hover:text-[#1e293b]"
               >
                 Limpiar filtros
-              </button>
+              </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <div key={product.id} className="bg-white rounded-lg shadow-md p-4 hover:shadow-xl transition-shadow duration-300">
-                  <img
-                    src={product.image || "/placeholder.svg"}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded-md mb-4"
-                  />
-                  <h2 className="text-lg font-semibold text-[#0f172a]">{product.name}</h2>
-                  <p className="text-sm text-gray-600">{product.description}</p>
-                  <p className="text-[#0f172a] font-bold mt-2">${product.price}</p>
-                  <div className="mt-4 flex justify-between">
-                    <button 
-                      onClick={() => handleToggleFavorite(product)} 
-                      className="text-red-500 hover:text-red-600 transition"
+            <>
+              <div className="mb-6 text-sm text-gray-600">
+                Mostrando {products.length} productos
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                {products.map((product) => {
+                  const enCarrito = estaEnCarrito(product.id);
+                  const cantidadEnCarrito = getCantidadEnCarrito(product.id);
+                  
+                  return (
+                    <div 
+                      key={product.id} 
+                      className="bg-white rounded-lg shadow-md p-4 hover:shadow-xl transition-shadow duration-300 relative group"
                     >
-                      <Heart className="w-5 h-5" />
-                    </button>
-                    <button
-                      onClick={() => handleAddToCart(product)}
-                      className="bg-[#0f172a] text-white px-4 py-2 rounded-lg hover:bg-[#1e293b] transition"
-                    >
-                      Agregar
-                    </button>
+                      {/* Badge de stock */}
+                      {product.stock <= 5 && product.stock > 0 && (
+                        <div className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded-full z-10">
+                          ¡Últimas {product.stock}!
+                        </div>
+                      )}
+                      
+                      {product.stock === 0 && (
+                        <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-10">
+                          Agotado
+                        </div>
+                      )}
+
+                      {/* Imagen del producto */}
+                      <div className="relative mb-4">
+                        <img
+                          src={product.image || "/placeholder.svg"}
+                          alt={product.name}
+                          className={`w-full h-48 object-cover rounded-md transition-all duration-300 ${
+                            product.stock === 0 ? 'grayscale opacity-50' : 'group-hover:scale-105'
+                          }`}
+                        />
+                        
+                        {/* Botón de favoritos */}
+                        <button 
+                          className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors"
+                          onClick={() => {
+                            // Aquí puedes agregar la lógica de favoritos
+                            console.log('Agregar a favoritos:', product.name);
+                          }}
+                        >
+                          <Heart className="w-4 h-4 text-red-500" />
+                        </button>
+                      </div>
+
+                      {/* Información del producto */}
+                      <div className="space-y-2">
+                        <h2 className="text-lg font-semibold text-[#0f172a] line-clamp-2 min-h-[3rem]">
+                          {product.name}
+                        </h2>
+                        
+                        <p className="text-sm text-gray-600 line-clamp-2 min-h-[2.5rem]">
+                          {product.description}
+                        </p>
+                        
+                        {/* Precio y unidad */}
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xl font-bold text-[#0f172a]">
+                              ${product.price}
+                            </p>
+                            <p className="text-xs text-gray-500">
+                              por {product.unit}
+                            </p>
+                          </div>
+                          
+                          {/* Badge de categoría */}
+                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                            {product.category}
+                          </span>
+                        </div>
+
+                        {/* Stock disponible */}
+                        <div className="text-sm text-gray-500">
+                          Stock: {product.stock} {product.unit}s
+                        </div>
+
+                        {/* Botones de acción */}
+                        <div className="flex items-center justify-between pt-2">
+                          {enCarrito ? (
+                            <div className="flex items-center gap-2 flex-1">
+                              <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  actualizarCantidad(
+                                    product.id || product._id,
+                                    getCantidadEnCarrito(product.id || product._id) + 1
+                                  );
+                                }}
+                                disabled={product.stock === 0}
+                                className="flex-1"
+                              >
+                                <Plus className="w-4 h-4 mr-1" />
+                                Agregar más
+                              </Button>
+                              <div className="flex items-center gap-1 text-sm text-green-600 font-medium">
+                                <Check className="w-4 h-4" />
+                                {cantidadEnCarrito}
+                              </div>
+                            </div>
+                          ) : (
+                            <Button
+                              onClick={() => handleAddToCart(product)}
+                              disabled={product.stock === 0}
+                              className="w-full bg-[#0f172a] text-white hover:bg-[#1e293b] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                            >
+                              {product.stock === 0 ? (
+                                'Agotado'
+                              ) : (
+                                <>
+                                  <ShoppingCart className="w-4 h-4 mr-2" />
+                                  Agregar al carrito
+                                </>
+                              )}
+                            </Button>
+                          )}
+                        </div>
+
+
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* Información adicional */}
+              <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-[#0f172a] mb-4">
+                  Información de Compra
+                </h3>
+                <div className="grid md:grid-cols-3 gap-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <ShoppingCart className="w-5 h-5 text-blue-600" />
+                    <span>Envío gratis en pedidos mayores a $500</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Heart className="w-5 h-5 text-red-500" />
+                    <span>Cada compra apoya a fundaciones</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Check className="w-5 h-5 text-green-600" />
+                    <span>Productos de calidad garantizada</span>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            </>
           )}
         </div>
       </div>
-
-      {/* Cart Component */}
-      <Cart
-        cart={cart}
-        onRemoveFromCart={handleRemoveFromCart}
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-      />
+      
+      <CarritoMejorado />
+      
     </div>
-  )
-}
+  );
+};
 
-export default Products
+export default Products;

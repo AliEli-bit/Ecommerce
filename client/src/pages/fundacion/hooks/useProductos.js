@@ -53,7 +53,7 @@ export const useProductos = () => {
     fetchProductos();
   }, []);
 
-  const handleAddProducto = async (productoData) => {
+  const handleAddProducto = async (productoData, imagenFile = null) => {
     try {
       console.log('Adding producto:', productoData);
       const token = localStorage.getItem('token');
@@ -61,12 +61,28 @@ export const useProductos = () => {
         throw new Error('No se encontró token de autenticación');
       }
 
-      const response = await axios.post(`${API_URL}/productos`, productoData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      // Crear FormData para enviar archivos
+      const formData = new FormData();
+      
+      // Agregar todos los campos del producto al FormData
+      Object.keys(productoData).forEach(key => {
+        if (productoData[key] !== null && productoData[key] !== undefined) {
+          formData.append(key, productoData[key]);
         }
       });
+
+      // Agregar la imagen si existe
+      if (imagenFile) {
+        formData.append('imagen', imagenFile);
+      }
+
+      const response = await axios.post(`${API_URL}/productos`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
       console.log('Add producto response:', response.data);
       setProductos(prev => [...prev, response.data]);
       return response.data;
@@ -76,7 +92,7 @@ export const useProductos = () => {
     }
   };
 
-  const handleEditProducto = async (id, productoData) => {
+  const handleEditProducto = async (id, productoData, imagenFile = null) => {
     try {
       console.log('Editing producto:', id, productoData);
       const token = localStorage.getItem('token');
@@ -84,12 +100,28 @@ export const useProductos = () => {
         throw new Error('No se encontró token de autenticación');
       }
 
-      const response = await axios.put(`${API_URL}/productos/${id}`, productoData, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
+      // Crear FormData para enviar archivos
+      const formData = new FormData();
+      
+      // Agregar todos los campos del producto al FormData
+      Object.keys(productoData).forEach(key => {
+        if (productoData[key] !== null && productoData[key] !== undefined) {
+          formData.append(key, productoData[key]);
         }
       });
+
+      // Agregar la imagen si existe (nueva imagen)
+      if (imagenFile) {
+        formData.append('imagen', imagenFile);
+      }
+
+      const response = await axios.put(`${API_URL}/productos/${id}`, formData, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      
       console.log('Edit producto response:', response.data);
       setProductos(prev => prev.map(p => p._id === id ? response.data : p));
       return response.data;
@@ -129,4 +161,4 @@ export const useProductos = () => {
     handleDeleteProducto,
     refreshProductos: fetchProductos
   };
-}; 
+};

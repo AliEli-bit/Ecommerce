@@ -24,11 +24,13 @@ import {
   ShoppingCart as CartIcon,
   Category as CategoryIcon,
   PhotoCamera,
+  Receipt as ReceiptIcon,
 } from '@mui/icons-material';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import ProductosTable from './components/ProductosTable';
 import ProductoForm from './components/ProductoForm';
+import OrdenesView from './components/OrdenesView';
 import { useProductos } from './hooks/useProductos';
 
 const StatCard = ({ title, value, icon: Icon, color, subtitle }) => (
@@ -54,6 +56,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const [openProductoForm, setOpenProductoForm] = useState(false);
+  const [openOrdenesView, setOpenOrdenesView] = useState(false);
   const [selectedProducto, setSelectedProducto] = useState(null);
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -222,13 +225,22 @@ const Dashboard = () => {
               <InventoryIcon className="h-8 w-8 text-blue-500" />
               <span className="ml-2 text-xl font-semibold text-gray-900">Dashboard Proveedor</span>
             </div>
-            <button
-              onClick={handleLogout}
-              className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-            >
-              <LogoutIcon className="w-5 h-5 mr-2" />
-              Cerrar Sesión
-            </button>
+            <div className="flex items-center space-x-4">
+              <button
+                onClick={() => setOpenOrdenesView(true)}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+              >
+                <ReceiptIcon className="w-5 h-5 mr-2" />
+                Ver Órdenes
+              </button>
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-gray-700 bg-gray-100 hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+              >
+                <LogoutIcon className="w-5 h-5 mr-2" />
+                Cerrar Sesión
+              </button>
+            </div>
           </div>
         </div>
       </header>
@@ -353,6 +365,12 @@ const Dashboard = () => {
         productoCreado={productoCreado}
         imagenFile={imagenFile}
         setImagenFile={setImagenFile}
+      />
+
+      {/* Ordenes View Dialog */}
+      <OrdenesView
+        open={openOrdenesView}
+        onClose={() => setOpenOrdenesView(false)}
       />
 
       {/* Snackbar */}

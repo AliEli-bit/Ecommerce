@@ -8,60 +8,60 @@ import Header from "@/components/layout/Header";
 
 export default function Home() {
   const carouselImages = [
-    {
-      src: "https://images.unsplash.com/photo-1532938911079-1b06ac7ceec7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      alt: "Fundación ayudando a niños con educación",
+     {
+      src: "https://scontent.fsrz1-2.fna.fbcdn.net/v/t39.30808-6/485723814_993465302896503_5361188402991283276_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=127cfc&_nc_ohc=CHv9Vu2dOgYQ7kNvwE5LdtY&_nc_oc=AdnU-bdHFdKQd2gtB51dQWkH2634cjwcDYxiKplhVPRaePQS8XAMe5V6iGjUEWt5Erg&_nc_zt=23&_nc_ht=scontent.fsrz1-2.fna&_nc_gid=-9N1mPZ78rb6fkn-n_dTyw&oh=00_AfK8rVXUZQEs0Nn0q9nahgpOOrkN1L-SSpA7Vs4Pk9Qx-Q&oe=683F8CBA",
+      alt: "Reforestación y plantación de árboles tras un incendio"
     },
     {
-      src: "https://images.unsplash.com/photo-1593113598332-cd288d649433?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      alt: "Voluntarios trabajando con niños en situación vulnerable",
+      src: "https://scontent.fsrz1-2.fna.fbcdn.net/v/t39.30808-6/474559056_1383157843058938_1036400792571714168_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=833d8c&_nc_ohc=Nd9UxHIkKUUQ7kNvwFXmLnv&_nc_oc=Adkb2Q6uWFC_qr9ADGWoZQTGYKdEaHV38rcfejI8xYqstJdb89B8Ox_ajFIAaO7lMLY&_nc_zt=23&_nc_ht=scontent.fsrz1-2.fna&_nc_gid=gL1nV3UEDpOVKxrde5GR4Q&oh=00_AfJ3WoGizyvNrDU_9n2zzSGK0IkbGXP6i1bU2c-8bvR-fg&oe=683FA079",
+      alt: "Voluntarios apagando un incendio forestal"
     },
     {
-      src: "https://images.unsplash.com/photo-1577896851231-70ef18881754?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      alt: "Niños recibiendo apoyo educativo y emocional",
+      src: "https://images.unsplash.com/photo-1617078306809-9e2e046c6b12?auto=format&fit=crop&w=1470&q=80",
+      alt: "Voluntarios rescatando animales afectados por incendios"
     },
     {
-      src: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80",
-      alt: "Fundación brindando apoyo nutricional a niños",
-    },
+      src: "https://images.unsplash.com/photo-1618169229254-22c7ff9ab093?auto=format&fit=crop&w=1470&q=80",
+      alt: "Guardabosques y voluntarios trabajando juntos para proteger la fauna"
+    }
   ];
-
+  
   return (
     <div className="flex flex-col min-h-screen">
       <Header />
       <main className="flex-1">
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-blue-50 to-white">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-orange-50 to-white">
           <div className="container px-4 md:px-6 mx-auto"> {/* Added mx-auto */}
-            <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
-              <div className="space-y-4">
-                <div className="inline-block rounded-lg bg-blue-100 px-3 py-1 text-sm text-blue-800">
-                  Compra con propósito
-                </div>
-                <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Cada compra es una donación para quienes más lo necesitan
-                </h1>
-                <p className="text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Descubre productos únicos mientras apoyas a fundaciones que están cambiando el mundo.
-                  El 100% de nuestras ganancias van directamente a causas benéficas.
-                </p>
-                <div className="flex flex-col gap-2 min-[400px]:flex-row">
-                  <Button size="lg" className="bg-blue-900 hover:bg-blue-800">
-                    Comprar ahora
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                  <Button size="lg" variant="outline">
-                    Conoce nuestras fundaciones
-                  </Button>
-                </div>
-              </div>
-              <div className="mx-auto w-full max-w-[600px] relative">
-                <ImageCarousel images={carouselImages} />
-                <div className="absolute -bottom-4 -right-4 bg-white p-4 rounded-lg shadow-lg">
-                  <p className="text-sm font-medium text-blue-900">+1000 productos</p>
-                  <p className="text-xs text-gray-500">Ayudando a 25+ fundaciones</p>
-                </div>
-              </div>
+          <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+          <div className="space-y-4">
+            <div className="inline-block rounded-lg bg-orange-100 px-3 py-1 text-sm text-orange-800">
+              Compra con propósito
             </div>
+            <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-gray-800">
+              Cada compra ayuda a proteger nuestro tierra
+            </h1>
+            <p className="text-gray-600 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+              Descubre productos eco-amigables mientras apoyas proyectos que restauran la Tierra.
+              El 100% de nuestras ganancias se destinan directamente a la conservación ambiental.
+            </p>
+            <div className="flex flex-col gap-2 min-[400px]:flex-row">
+              <Button size="lg" className="bg-orange-600 hover:bg-orange-700 text-white">
+                Comprar ahora
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
+              <Button size="lg" variant="outline" className="border-orange-600 text-orange-600 hover:bg-orange-50">
+                Conoce nuestras fundaciones
+              </Button>
+            </div>
+          </div>
+          <div className="mx-auto w-full max-w-[600px] relative">
+            <ImageCarousel images={carouselImages} />
+            <div className="absolute -bottom-4 -right-4 bg-white p-4 rounded-lg shadow-lg">
+              <p className="text-sm font-medium text-orange-700">+1000 productos</p>
+              <p className="text-xs text-gray-500">Ayudando a 25+ fundaciones</p>
+            </div>
+          </div>
+        </div>
           </div>
         </section>
 
@@ -78,11 +78,11 @@ export default function Home() {
               </div>
             </div>
             <div className="mx-auto grid max-w-5xl items-center gap-6 py-12 lg:grid-cols-3">
-              <Card className="border-2 border-blue-100">
+              <Card className="border-2 border-orange-100">
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center space-y-4 text-center">
-                    <div className="bg-blue-100 p-3 rounded-full">
-                      <ShoppingBag className="h-6 w-6 text-blue-900" />
+                    <div className="bg-orange-100 p-3 rounded-full">
+                      <ShoppingBag className="h-6 w-6 text-orange-700" />
                     </div>
                     <h3 className="text-xl font-bold">Compra productos</h3>
                     <p className="text-gray-500 text-sm">
@@ -91,11 +91,11 @@ export default function Home() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-2 border-blue-100">
+              <Card className="border-2 border-orange-100">
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center space-y-4 text-center">
-                    <div className="bg-blue-100 p-3 rounded-full">
-                      <Gift className="h-6 w-6 text-blue-900" />
+                    <div className="bg-orange-100 p-3 rounded-full">
+                      <Gift className="h-6 w-6 text-orange-700" />
                     </div>
                     <h3 className="text-xl font-bold">Recibe tu pedido</h3>
                     <p className="text-gray-500 text-sm">
@@ -104,11 +104,11 @@ export default function Home() {
                   </div>
                 </CardContent>
               </Card>
-              <Card className="border-2 border-blue-100">
+              <Card className="border-2 border-orange-100">
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center space-y-4 text-center">
-                    <div className="bg-blue-100 p-3 rounded-full">
-                      <Anchor className="h-6 w-6 text-blue-900" />
+                    <div className="bg-orange-100 p-3 rounded-full">
+                      <Anchor className="h-6 w-6 text-orange-700" />
                     </div>
                     <h3 className="text-xl font-bold">Genera impacto</h3>
                     <p className="text-gray-500 text-sm">
@@ -121,7 +121,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-blue-50">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-orange-50">
           <div className="container px-4 md:px-6 mx-auto"> {/* Added mx-auto */}
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2">
@@ -144,7 +144,7 @@ export default function Home() {
                     />
                   </div>
                   <div className="p-4 bg-white">
-                    <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Fundación Esperanza</Badge>
+                    <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">Fundación Esperanza</Badge>
                     <h3 className="text-lg font-bold mt-2">Producto Artesanal {item}</h3>
                     <p className="text-sm text-gray-500 mt-1">Hecho a mano por artesanos locales</p>
                     <div className="flex items-center justify-between mt-3">
@@ -159,7 +159,7 @@ export default function Home() {
               ))}
             </div>
             <div className="flex justify-center">
-              <Button size="lg" className="bg-blue-900 hover:bg-blue-800">
+              <Button size="lg" className="bg-orange-600 hover:bg-orange-700">
                 Ver todos los productos
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -196,11 +196,11 @@ export default function Home() {
                     </p>
                     <div className="flex items-center mt-4 space-x-4">
                         <div className="flex flex-col">
-                        <span className="text-2xl font-bold text-blue-900">+1000</span>
+                        <span className="text-2xl font-bold text-orange-600">+1000</span>
                         <span className="text-xs text-gray-500">Beneficiarios</span>
                         </div>
                         <div className="flex flex-col">
-                        <span className="text-2xl font-bold text-blue-900">5</span>
+                        <span className="text-2xl font-bold text-orange-600">5</span>
                         <span className="text-xs text-gray-500">Años de trabajo</span>
                         </div>
                     </div>
@@ -219,7 +219,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-blue-900 text-white">
+        <section className="w-full py-12 md:py-24 lg:py-32 bg-orange-800 text-white">
           <div className="container px-4 md:px-6 mx-auto"> {/* Added mx-auto */}
             <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
               <div className="space-y-4">
@@ -282,7 +282,7 @@ export default function Home() {
                     placeholder="Ingresa tu correo electrónico"
                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                   />
-                  <Button type="submit" className="bg-blue-900 hover:bg-blue-800">
+                  <Button type="submit" className="bg-orange-600 hover:bg-orange-700">
                     Suscribirse
                   </Button>
                 </form>
@@ -303,7 +303,7 @@ export default function Home() {
           <div className="grid gap-8 sm:grid-cols-2 md:grid-cols-4">
             <div className="space-y-3">
               <div className="flex items-center gap-2">
-                <Anchor className="h-6 w-6 text-blue-900" />
+                <Heart className="h-6 w-6 text-orange-600" />
                 <span className="text-xl font-bold">CompraConCausa</span>
               </div>
               <p className="text-sm text-gray-500">

@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { X, CreditCard, ShoppingCart } from 'lucide-react';
+import { X, CreditCard, ShoppingCart, Plus, Minus } from 'lucide-react';
 import PaymentForm from './PaymentForm';
 
-const Cart = ({ cart, onRemoveFromCart, isOpen, onClose }) => {
+const Cart = ({ cart, onRemoveFromCart, onUpdateQuantity, isOpen, onClose }) => {
   const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   const calculateTotal = () => {
@@ -15,6 +15,16 @@ const Cart = ({ cart, onRemoveFromCart, isOpen, onClose }) => {
     // Aquí podrías agregar la lógica para marcar los productos como vendidos
   };
 
+  const handleQuantityChange = (productId, change) => {
+    const item = cart.find(item => item.id === productId);
+    if (item) {
+      const newQuantity = item.quantity + change;
+      if (newQuantity > 0) {
+        onUpdateQuantity(productId, newQuantity);
+      }
+    }
+  };
+
   // Botón flotante del carrito
   const CartButton = () => (
     <button
@@ -24,7 +34,7 @@ const Cart = ({ cart, onRemoveFromCart, isOpen, onClose }) => {
       <ShoppingCart className="w-6 h-6" />
       {cart.length > 0 && (
         <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-          {cart.length}
+          {cart.reduce((total, item) => total + item.quantity, 0)}
         </span>
       )}
     </button>
@@ -46,6 +56,7 @@ const Cart = ({ cart, onRemoveFromCart, isOpen, onClose }) => {
           <PaymentForm
             onClose={() => setShowPaymentForm(false)}
             onSuccess={handlePaymentSuccess}
+            total={calculateTotal().toFixed(2)}
           />
         ) : (
           <>
@@ -57,16 +68,36 @@ const Cart = ({ cart, onRemoveFromCart, isOpen, onClose }) => {
               ) : (
                 <div className="space-y-4">
                   {cart.map((item, index) => (
-                    <div key={index} className="flex items-center justify-between p-4 border rounded-lg bg-white hover:shadow-md transition-shadow duration-300">
+                    <div key={item.id} className="flex items-center justify-between p-4 border rounded-lg bg-white hover:shadow-md transition-shadow duration-300">
                       <div className="flex-1">
                         <h3 className="font-medium text-[#0f172a]">{item.name}</h3>
                         <p className="text-sm text-gray-500">
-                          ${item.price} x {item.quantity} {item.unit}
+                          ${item.price} por {item.unit}
                         </p>
+                        <div className="flex items-center mt-2 space-x-2">
+                          <button
+                            onClick={() => handleQuantityChange(item.id, -1)}
+                            className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="px-2 py-1 bg-gray-100 rounded min-w-[2rem] text-center">
+                            {item.quantity}
+                          </span>
+                          <button
+                            onClick={() => handleQuantityChange(item.id, 1)}
+                            className="w-6 h-6 rounded-full bg-gray-200 flex items-center justify-center hover:bg-gray-300 transition"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                          <span className="text-sm text-gray-600 ml-2">
+                            = ${(item.price * item.quantity).toFixed(2)}
+                          </span>
+                        </div>
                       </div>
                       <button
                         onClick={() => onRemoveFromCart(index)}
-                        className="text-red-500 hover:text-red-600 transition"
+                        className="text-red-500 hover:text-red-600 transition ml-2"
                       >
                         <X className="w-5 h-5" />
                       </button>
@@ -78,6 +109,12 @@ const Cart = ({ cart, onRemoveFromCart, isOpen, onClose }) => {
 
             {cart.length > 0 && (
               <div className="border-t pt-4 mt-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm text-gray-600">Artículos:</span>
+                  <span className="text-sm text-gray-600">
+                    {cart.reduce((total, item) => total + item.quantity, 0)}
+                  </span>
+                </div>
                 <div className="flex justify-between items-center mb-4">
                   <span className="font-medium text-[#0f172a]">Total:</span>
                   <span className="font-bold text-[#0f172a]">${calculateTotal().toFixed(2)}</span>

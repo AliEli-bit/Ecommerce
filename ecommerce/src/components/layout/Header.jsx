@@ -14,23 +14,11 @@ export default function Header() {
           <Link to="/" className="text-sm font-medium hover:underline underline-offset-4">
             Inicio
           </Link>
-          <Link to="/foundations" className="text-sm font-medium hover:underline underline-offset-4">
-            Fundaciones
-          </Link>
           <Link to="/about" className="text-sm font-medium hover:underline underline-offset-4">
             Sobre Nosotros
           </Link>
-          <Link to="/contact" className="text-sm font-medium hover:underline underline-offset-4">
-            Contacto
-          </Link>
         </nav>
         <div className="flex items-center gap-4">
-          <Link to="/cart" className="hidden md:flex">
-            <Button variant="outline" size="icon">
-              <ShoppingBag className="h-5 w-5" />
-              <span className="sr-only">Carrito</span>
-            </Button>
-          </Link>
           <Link to="/login" className="hidden md:block">
             <Button>Iniciar Sesión</Button>
           </Link>

@@ -207,6 +207,23 @@ const ProductoForm = ({ open, onClose, onSubmit, initialData, proveedores }) => 
             </FormControl>
           </Box>
 
+          <FormControl fullWidth required>
+            <InputLabel>Proveedor</InputLabel>
+            <Select
+              name="proveedor"
+              value={formData.proveedor}
+              onChange={handleChange}
+              label="Proveedor"
+              disabled={loading}
+            >
+              {proveedores?.map((proveedor) => (
+                <MenuItem key={proveedor._id} value={proveedor._id}>
+                  {proveedor.nombre}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+
           <Box>
             <Typography variant="subtitle1" gutterBottom>
               Imagen del Producto (Opcional)
