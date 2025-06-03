@@ -121,51 +121,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="w-full py-12 md:py-24 lg:py-32 bg-orange-50">
-          <div className="container px-4 md:px-6 mx-auto"> {/* Added mx-auto */}
-            <div className="flex flex-col items-center justify-center space-y-4 text-center">
-              <div className="space-y-2">
-                <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                  Productos destacados
-                </h2>
-                <p className="max-w-[900px] text-gray-500 md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
-                  Cada producto apoya una causa específica
-                </p>
-              </div>
-            </div>
-            <div className="mx-auto grid max-w-5xl gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
-              {[1, 2, 3, 4, 5, 6].map((item) => (
-                <Link to="#" key={item} className="group relative overflow-hidden rounded-lg border">
-                  <div className="aspect-square overflow-hidden">
-                    <img
-                      src={`/placeholder.svg?height=400&width=400&text=Producto ${item}`}
-                      alt={`Producto ${item}`}
-                      className="object-cover transition-transform group-hover:scale-105 aspect-square"
-                    />
-                  </div>
-                  <div className="p-4 bg-white">
-                    <Badge className="bg-orange-100 text-orange-800 hover:bg-orange-100">Fundación Esperanza</Badge>
-                    <h3 className="text-lg font-bold mt-2">Producto Artesanal {item}</h3>
-                    <p className="text-sm text-gray-500 mt-1">Hecho a mano por artesanos locales</p>
-                    <div className="flex items-center justify-between mt-3">
-                      <span className="text-lg font-bold">$29.99</span>
-                      <Button size="sm" variant="outline" className="rounded-full">
-                        <ShoppingBag className="h-4 w-4 mr-2" />
-                        Añadir
-                      </Button>
-                    </div>
-                  </div>
-                </Link>
-              ))}
-            </div>
-            <div className="flex justify-center">
-              <Button size="lg" className="bg-orange-600 hover:bg-orange-700">
-                Ver todos los productos
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </div>
-          </div>
-        </section>
+        
 
         <section className="w-full py-12 md:py-24 lg:py-32">
           <div className="container px-4 md:px-6 mx-auto"> {/* Added mx-auto */}
