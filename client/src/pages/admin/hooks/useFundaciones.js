@@ -20,7 +20,8 @@ export const useFundaciones = () => {
     cuentaBancaria: '',
     logo: '',
     password: '',
-    descripcion: ''
+    descripcion: '',
+    location: [-17.7833, -63.1821] // Default to Bolivia coordinates
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(true);
@@ -51,7 +52,8 @@ export const useFundaciones = () => {
       setEditingFundacion(fundacion);
       setFormData({
         ...fundacion,
-        password: '' // Don't show password when editing
+        password: '', // Don't show password when editing
+        location: fundacion.location || [-17.7833, -63.1821]
       });
     } else {
       setEditingFundacion(null);
@@ -70,7 +72,8 @@ export const useFundaciones = () => {
         cuentaBancaria: '',
         logo: '',
         password: '',
-        descripcion: ''
+        descripcion: '',
+        location: [-17.7833, -63.1821]
       });
     }
     setOpenDialog(true);
@@ -113,6 +116,9 @@ export const useFundaciones = () => {
     if (!formData.mision) newErrors.mision = true;
     if (!formData.areaAccion) newErrors.areaAccion = true;
     if (!editingFundacion && !formData.password) newErrors.password = true;
+    if (!formData.location || !Array.isArray(formData.location) || formData.location.length !== 2) {
+      newErrors.location = 'Debe seleccionar una ubicación en el mapa';
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;

@@ -28,8 +28,20 @@ import {
   Badge as BadgeIcon,
   Info as InfoIcon,
   Store as StoreIcon,
+  MyLocation as MyLocationIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../../context/AuthContext';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icon in Leaflet with React
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
 const tiposServicio = [
   'Alimentos',
@@ -39,6 +51,20 @@ const tiposServicio = [
   'Productos de limpieza',
   'Otros'
 ];
+
+const LocationMarker = ({ position, setPosition }) => {
+  useMapEvents({
+    click(e) {
+      setPosition([e.latlng.lat, e.latlng.lng]);
+    },
+  });
+
+  return position ? <Marker position={position} draggable={true} eventHandlers={{
+    dragend: (e) => {
+      setPosition([e.target.getLatLng().lat, e.target.getLatLng().lng]);
+    },
+  }} /> : null;
+};
 
 const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
   const { user } = useAuth();
@@ -55,11 +81,19 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
     },
     tipoServicio: '',
     fundacion: user?.entidadRelacionada || '',
+    location: initialData?.location || [-17.7833, -63.1821], // [lat, lng] format for Leaflet
     ...initialData
   });
 
   const [errors, setErrors] = useState({});
   const [submitError, setSubmitError] = useState('');
+
+  const mapContainerStyle = {
+    width: '100%',
+    height: '300px',
+    borderRadius: '8px',
+    marginTop: '8px'
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -77,7 +111,8 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
           ci: ''
         },
         tipoServicio: '',
-        fundacion: user?.entidadRelacionada || ''
+        fundacion: user?.entidadRelacionada || '',
+        location: [-17.7833, -63.1821] // [lat, lng] format for Leaflet
       });
     }
     setErrors({});
@@ -102,6 +137,7 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
     if (!formData.representante?.nombre?.trim()) newErrors['representante.nombre'] = 'El nombre del representante es requerido';
     if (!formData.representante?.ci?.trim()) newErrors['representante.ci'] = 'La cédula del representante es requerida';
     if (!formData.fundacion) newErrors.fundacion = 'La fundación es requerida';
+    if (!formData.location || formData.location.length !== 2) newErrors.location = 'Debe seleccionar una ubicación en el mapa';
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -131,6 +167,13 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
         [name]: undefined
       }));
     }
+  };
+
+  const handleMapClick = (newPosition) => {
+    setFormData(prev => ({
+      ...prev,
+      location: newPosition
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -386,6 +429,45 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData }) => {
                   ),
                 }}
               />
+            </Grid>
+
+            {/* Add Map after the address field */}
+            <Grid item xs={12}>
+              <Box className="flex items-center mb-2">
+                <MyLocationIcon className="text-primary-600 mr-2" />
+                <Typography variant="h6" className="text-gray-900">
+                  Ubicación en el Mapa
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="textSecondary" className="mb-2">
+                Haga clic en el mapa para seleccionar la ubicación exacta del proveedor
+              </Typography>
+              <div style={mapContainerStyle}>
+                <MapContainer
+                  center={formData.location}
+                  zoom={13}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <LocationMarker 
+                    position={formData.location} 
+                    setPosition={handleMapClick}
+                  />
+                </MapContainer>
+              </div>
+              {errors.location && (
+                <Typography variant="caption" color="error" className="mt-1">
+                  {errors.location}
+                </Typography>
+              )}
+              <Box className="mt-2">
+                <Typography variant="body2">
+                  Coordenadas seleccionadas: {formData.location[0].toFixed(6)}, {formData.location[1].toFixed(6)}
+                </Typography>
+              </Box>
             </Grid>
           </Grid>
         </DialogContent>

@@ -7,6 +7,8 @@ import {
   DialogTitle,
   TextField,
   CircularProgress,
+  Box,
+  Typography,
 } from '@mui/material';
 import {
   Add as AddIcon,
@@ -17,9 +19,35 @@ import {
   LocationOn as LocationIcon,
   Phone as PhoneIcon,
   Email as EmailIcon,
+  MyLocation as MyLocationIcon,
 } from '@mui/icons-material';
 import { useFundaciones } from './hooks/useFundaciones';
 import StatCard from './components/StatCard';
+import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
+import L from 'leaflet';
+
+// Fix for default marker icon in Leaflet with React
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
+
+const LocationMarker = ({ position, setPosition }) => {
+  useMapEvents({
+    click(e) {
+      setPosition([e.latlng.lat, e.latlng.lng]);
+    },
+  });
+
+  return position ? <Marker position={position} draggable={true} eventHandlers={{
+    dragend: (e) => {
+      setPosition([e.target.getLatLng().lat, e.target.getLatLng().lng]);
+    },
+  }} /> : null;
+};
 
 const Fundaciones = () => {
   const navigate = useNavigate();
@@ -37,6 +65,13 @@ const Fundaciones = () => {
     handleSubmit,
     handleDelete,
   } = useFundaciones();
+
+  const mapContainerStyle = {
+    width: '100%',
+    height: '300px',
+    borderRadius: '8px',
+    marginTop: '8px'
+  };
 
   if (loading) {
     return (
@@ -223,6 +258,43 @@ const Fundaciones = () => {
               helperText={errors.direccion ? 'La dirección es requerida' : ''}
               className="md:col-span-2"
             />
+            <div className="md:col-span-2">
+              <Box className="flex items-center mb-2">
+                <MyLocationIcon className="text-primary-600 mr-2" />
+                <Typography variant="h6" className="text-gray-900">
+                  Ubicación en el Mapa
+                </Typography>
+              </Box>
+              <Typography variant="body2" color="textSecondary" className="mb-2">
+                Haga clic en el mapa para seleccionar la ubicación exacta de la fundación
+              </Typography>
+              <div style={mapContainerStyle}>
+                <MapContainer
+                  center={formData.location || [-17.7833, -63.1821]}
+                  zoom={13}
+                  style={{ height: '100%', width: '100%' }}
+                >
+                  <TileLayer
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                  />
+                  <LocationMarker 
+                    position={formData.location || [-17.7833, -63.1821]} 
+                    setPosition={(newPosition) => handleInputChange({ target: { name: 'location', value: newPosition } })}
+                  />
+                </MapContainer>
+              </div>
+              {errors.location && (
+                <Typography variant="caption" color="error" className="mt-1">
+                  {errors.location}
+                </Typography>
+              )}
+              <Box className="mt-2">
+                <Typography variant="body2">
+                  Coordenadas seleccionadas: {formData.location ? `${formData.location[0].toFixed(6)}, ${formData.location[1].toFixed(6)}` : 'No seleccionada'}
+                </Typography>
+              </Box>
+            </div>
             <TextField
               fullWidth
               label="Teléfono"
