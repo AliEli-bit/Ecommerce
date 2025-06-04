@@ -621,10 +621,14 @@ export const confirmarPago = async (req, res) => {
     res.json({
       message: 'Pago confirmado exitosamente',
       orden: {
+        _id: orden._id,
         numeroOrden: orden.numeroOrden,
         total: orden.total,
         estadoPago: orden.estadoPago,
-        estadoEnvio: orden.estadoEnvio
+        estadoEnvio: orden.estadoEnvio,
+        direccionEnvio: orden.direccionEnvio,
+        datosContacto: orden.datosContacto,
+        // Puedes agregar más campos si lo deseas
       }
     });
   } catch (error) {

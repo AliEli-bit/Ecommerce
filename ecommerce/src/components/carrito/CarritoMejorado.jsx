@@ -6,9 +6,11 @@ import { useCarritoAvanzado } from '../../hooks/useCarritoAvanzado';
 import StripeCheckout from '../checkout/StripeCheckout';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
+import { useNavigate } from 'react-router-dom';
+
 
 // Inicializar Stripe (con tu clave pública de entorno)
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
+const stripePromise = loadStripe('pk_test_51RUpeqGbqqKeGkYdc0b9t7UGY6JZjAnVo7oEQO23HBJnLJmC7H8LxzIFfreHLjdWCHQuPyM3m2XsaNqN7lwKIoNQ00Y0ENiARD');
 
 const CarritoMejorado = () => {
   const {
@@ -27,6 +29,9 @@ const CarritoMejorado = () => {
   } = useCarritoAvanzado();
 
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [showDeliverySimulation, setShowDeliverySimulation] = useState(false);
+  const [orderDetails, setOrderDetails] = useState(null);
+  const navigate = useNavigate();
 
   const handleCantidadChange = async (productoId, nuevaCantidad) => {
     if (nuevaCantidad < 1) {
@@ -41,9 +46,23 @@ const CarritoMejorado = () => {
     }
   };
 
-  const handleCheckoutSuccess = (ordenSimulada) => {
-    setIsCheckoutOpen(false);
-    setIsCartOpen(false);
+  const handleSuccess = (orden) => {
+    const formattedOrder = {
+      _id: orden._id,
+      direccionEnvio: {
+        calle: orden.direccionEnvio?.calle || '',
+        ciudad: orden.direccionEnvio?.ciudad || '',
+        estado: orden.direccionEnvio?.estado || '',
+        codigoPostal: orden.direccionEnvio?.codigoPostal || '',
+      },
+      datosContacto: {
+        nombre: orden.datosContacto?.nombre || '',
+        email: orden.datosContacto?.email || '',
+        telefono: orden.datosContacto?.telefono || '',
+      }
+    };
+    // Redirige a la página de entrega y pasa la orden
+    navigate('/delivery', { state: { order: formattedOrder } });
   };
 
   const formatPrice = (price) => {
@@ -134,7 +153,7 @@ const CarritoMejorado = () => {
                 <StripeCheckout
                   isOpen={isCheckoutOpen}
                   onClose={() => setIsCheckoutOpen(false)}
-                  onSuccess={handleCheckoutSuccess}
+                  onSuccess={handleSuccess}
                   total={totales.total}
                   desglose={totales}
                 />
