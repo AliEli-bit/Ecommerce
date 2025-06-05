@@ -16,7 +16,7 @@ export const obtenerCarrito = async (req, res) => {
         estado: 'activo' 
       }).populate({
         path: 'items.producto',
-        select: 'nombre precio imagenes stock categoria'
+        select: 'nombre precio imagenes stock categoria proveedor'
       });
       
       if (!carrito) {
@@ -37,7 +37,7 @@ export const obtenerCarrito = async (req, res) => {
         estado: 'activo' 
       }).populate({
         path: 'items.producto',
-        select: 'nombre precio imagenes stock categoria'
+        select: 'nombre precio imagenes stock categoria proveedor'
       });
       
       if (!carrito) {
@@ -151,7 +151,7 @@ export const agregarAlCarrito = async (req, res) => {
     // Poblar los datos del producto para la respuesta
     await carrito.populate({
       path: 'items.producto',
-      select: 'nombre precio imagenes stock categoria'
+      select: 'nombre precio imagenes stock categoria proveedor'
     });
     
     res.json({
@@ -228,7 +228,7 @@ export const actualizarCantidadCarrito = async (req, res) => {
     
     await carrito.populate({
       path: 'items.producto',
-      select: 'nombre precio imagenes stock categoria'
+      select: 'nombre precio imagenes stock categoria proveedor'
     });
     
     res.json({
@@ -278,7 +278,7 @@ export const eliminarDelCarrito = async (req, res) => {
     
     await carrito.populate({
       path: 'items.producto',
-      select: 'nombre precio imagenes stock categoria'
+      select: 'nombre precio imagenes stock categoria proveedor'
     });
     
     res.json({
@@ -382,7 +382,7 @@ export const transferirCarrito = async (req, res) => {
     
     await carritoUsuario.populate({
       path: 'items.producto',
-      select: 'nombre precio imagenes stock categoria'
+      select: 'nombre precio imagenes stock categoria proveedor'
     });
     
     res.json({
@@ -406,7 +406,7 @@ export const obtenerResumenCarrito = async (req, res) => {
         estado: 'activo' 
       }).populate({
         path: 'items.producto',
-        select: 'nombre precio imagenes stock categoria'
+        select: 'nombre precio imagenes stock categoria proveedor'
       });
     } else {
       const sessionId = req.headers['x-session-id'];
@@ -415,7 +415,7 @@ export const obtenerResumenCarrito = async (req, res) => {
         estado: 'activo' 
       }).populate({
         path: 'items.producto',
-        select: 'nombre precio imagenes stock categoria'
+        select: 'nombre precio imagenes stock categoria proveedor'
       });
     }
     
@@ -445,7 +445,7 @@ export const obtenerResumenCarrito = async (req, res) => {
   }
 };
 
-// Crear Payment Intent de Stripe
+// Crear Payment Intent de Stripe (FUNCIÓN CORREGIDA)
 export const crearPaymentIntent = async (req, res) => {
   try {
     const { direccionEnvio, datosContacto } = req.body;
@@ -458,7 +458,12 @@ export const crearPaymentIntent = async (req, res) => {
         estado: 'activo' 
       }).populate({
         path: 'items.producto',
-        select: 'nombre precio imagenes stock categoria'
+        select: 'nombre precio imagenes stock categoria proveedor',
+        // IMPORTANTE: También poblar el proveedor si es una referencia
+        populate: {
+          path: 'proveedor',
+          select: 'nombre email'
+        }
       });
     } else {
       const sessionId = req.headers['x-session-id'];
@@ -470,7 +475,12 @@ export const crearPaymentIntent = async (req, res) => {
         estado: 'activo' 
       }).populate({
         path: 'items.producto',
-        select: 'nombre precio imagenes stock categoria'
+        select: 'nombre precio imagenes stock categoria proveedor',
+        // IMPORTANTE: También poblar el proveedor si es una referencia
+        populate: {
+          path: 'proveedor',
+          select: 'nombre email'
+        }
       });
     }
     
@@ -510,17 +520,37 @@ export const crearPaymentIntent = async (req, res) => {
       }
     });
     
-    // Crear orden pendiente
+    // Crear orden pendiente con proveedor correctamente extraído
     const orden = await Orden.create({
       numeroOrden: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
       usuario: req.user ? req.user._id : null,
-      items: carrito.items.map(item => ({
-        producto: item.producto._id,
-        nombre: item.producto.nombre,
-        cantidad: item.cantidad,
-        precioUnitario: item.precioUnitario,
-        subtotal: item.subtotal
-      })),
+      items: carrito.items.map(item => {
+        // Debug: verificar el proveedor
+        console.log('ITEM COMPLETO:', JSON.stringify(item, null, 2));
+        console.log('PRODUCTO:', item.producto);
+        console.log('PROVEEDOR DEL PRODUCTO:', item.producto.proveedor);
+        
+        // Extraer el ID del proveedor correctamente
+        let proveedorId;
+        if (typeof item.producto.proveedor === 'object' && item.producto.proveedor._id) {
+          // Si está poblado como objeto
+          proveedorId = item.producto.proveedor._id;
+        } else {
+          // Si es solo el ID
+          proveedorId = item.producto.proveedor;
+        }
+        
+        console.log('PROVEEDOR ID EXTRAÍDO:', proveedorId);
+        
+        return {
+          producto: item.producto._id,
+          proveedor: proveedorId,
+          nombre: item.producto.nombre,
+          cantidad: item.cantidad,
+          precioUnitario: item.precioUnitario,
+          subtotal: item.subtotal
+        };
+      }),
       subtotal,
       impuestos,
       envio,
@@ -531,6 +561,8 @@ export const crearPaymentIntent = async (req, res) => {
       estadoPago: 'pendiente',
       estadoEnvio: 'pendiente'
     });
+    
+    console.log('ORDEN CREADA:', JSON.stringify(orden, null, 2));
     
     // Actualizar estado del carrito
     carrito.estado = 'procesando';

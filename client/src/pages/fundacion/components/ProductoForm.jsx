@@ -13,9 +13,12 @@ import {
   Box,
   IconButton,
   Typography,
-  Alert
+  Alert,
+  Chip,
+  OutlinedInput
 } from '@mui/material';
 import { PhotoCamera, Delete } from '@mui/icons-material';
+import axios from 'axios';
 
 const unidades = ['kg', 'unidad', 'litro', 'metro'];
 const categorias = ['materiales', 'equipos', 'alimentos', 'gaseosas', 'otros'];
@@ -37,13 +40,15 @@ const ProductoForm = ({
     stock: '',
     categoria: '',
     proveedor: '',
-    estado: 'activo'
+    estado: 'activo',
+    fundaciones_asociadas: []
   });
 
   const [imagenFile, setImagenFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [productoCreado, setProductoCreado] = useState(null);
+  const [fundaciones, setFundaciones] = useState([]);
 
   // Determinar si estamos editando o creando
   const isEditing = initialData && initialData._id;
@@ -51,6 +56,23 @@ const ProductoForm = ({
   // Estados del formulario
   const [showDataForm, setShowDataForm] = useState(true);
   const [showImageSection, setShowImageSection] = useState(true);
+
+  // Cargar fundaciones al abrir el formulario
+  useEffect(() => {
+    if (open) {
+      fetchFundaciones();
+    }
+  }, [open]);
+
+  const fetchFundaciones = async () => {
+    try {
+      const response = await axios.get('/api/fundaciones');
+      setFundaciones(response.data);
+    } catch (error) {
+      console.error('Error al cargar fundaciones:', error);
+      setError('Error al cargar las fundaciones');
+    }
+  };
 
   useEffect(() => {
     console.log('=== PRODUCTO FORM PROPS ===');
@@ -70,7 +92,8 @@ const ProductoForm = ({
           stock: initialData.stock ? initialData.stock.toString() : '',
           categoria: initialData.categoria || '',
           proveedor: initialData.proveedor || '',
-          estado: initialData.estado || 'activo'
+          estado: initialData.estado || 'activo',
+          fundaciones_asociadas: initialData.fundaciones_asociadas || []
         });
         setShowDataForm(true);
         setShowImageSection(true);
@@ -85,7 +108,8 @@ const ProductoForm = ({
           stock: '',
           categoria: '',
           proveedor: '',
-          estado: 'activo'
+          estado: 'activo',
+          fundaciones_asociadas: []
         });
         setShowDataForm(true);
         setShowImageSection(true);
@@ -107,6 +131,16 @@ const ProductoForm = ({
     if (error) {
       setError('');
     }
+  };
+
+  const handleFundacionesChange = (event) => {
+    const {
+      target: { value },
+    } = event;
+    setFormData(prev => ({
+      ...prev,
+      fundaciones_asociadas: typeof value === 'string' ? value.split(',') : value,
+    }));
   };
 
   const handleImageChange = (e) => {
@@ -260,7 +294,8 @@ const ProductoForm = ({
       stock: '',
       categoria: '',
       proveedor: '',
-      estado: 'activo'
+      estado: 'activo',
+      fundaciones_asociadas: []
     });
     setImagenFile(null);
     setError('');
@@ -418,6 +453,36 @@ const ProductoForm = ({
                       No hay proveedores disponibles
                     </MenuItem>
                   )}
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <InputLabel>Fundaciones Asociadas</InputLabel>
+                <Select
+                  multiple
+                  value={formData.fundaciones_asociadas}
+                  onChange={handleFundacionesChange}
+                  input={<OutlinedInput label="Fundaciones Asociadas" />}
+                  renderValue={(selected) => (
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                      {selected.map((value) => {
+                        const fundacion = fundaciones.find(f => f._id === value);
+                        return (
+                          <Chip 
+                            key={value} 
+                            label={fundacion ? fundacion.nombre : value}
+                            sx={{ m: 0.5 }}
+                          />
+                        );
+                      })}
+                    </Box>
+                  )}
+                >
+                  {fundaciones.map((fundacion) => (
+                    <MenuItem key={fundacion._id} value={fundacion._id}>
+                      {fundacion.nombre}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
             </>

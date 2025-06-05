@@ -44,6 +44,11 @@ const productoSchema = new mongoose.Schema({
     ref: 'Fundacion',
     required: true
   },
+  //modifcacion para fundaciones asociadas(productos de fundaciones asociadas, para que un producto pueda ser vendido en varias fundaciones)
+  fundaciones_asociadas: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Fundacion'
+  }],
   estado: {
     type: String,
     enum: ['activo', 'inactivo'],

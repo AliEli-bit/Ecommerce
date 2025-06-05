@@ -6,7 +6,7 @@ import { upload } from '../config/cloudinary.js';
 // Crear un nuevo producto
 export const crearProducto = async (req, res) => {
   try {
-    const { nombre, descripcion, precio, unidad, stock, categoria, proveedor } = req.body;
+    const { nombre, descripcion, precio, unidad, stock, categoria, proveedor, fundaciones_asociadas } = req.body;
     let imagenes = [];
     if (req.file) {
       imagenes.push({
@@ -75,6 +75,7 @@ export const crearProducto = async (req, res) => {
       categoria,
       proveedor: proveedorId,
       fundacion,
+      fundaciones_asociadas: fundaciones_asociadas || [],
       imagenes
     });
 
@@ -178,8 +179,13 @@ export const actualizarProducto = async (req, res) => {
       }
     }
 
+    // Actualizar campos
     Object.keys(req.body).forEach(key => {
-      producto[key] = req.body[key];
+      if (key === 'fundaciones_asociadas') {
+        producto[key] = req.body[key] || [];
+      } else {
+        producto[key] = req.body[key];
+      }
     });
 
     const productoActualizado = await producto.save();

@@ -6,6 +6,11 @@ const ordenItemSchema = new mongoose.Schema({
     ref: 'Producto',
     required: true
   },
+  proveedor: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
+    required: true
+  },
   nombre: String,
   cantidad: {
     type: Number,
@@ -40,10 +45,6 @@ const ordenSchema = new mongoose.Schema({
     type: Number,
     required: true,
     min: 0
-  },
-  impuestos: {
-    type: Number,
-    default: 0
   },
   envio: {
     type: Number,

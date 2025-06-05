@@ -114,6 +114,21 @@ export const useProveedores = () => {
     }
   };
 
+  const handleChangeEstadoProveedor = async (id, nuevoEstado) => {
+    try {
+      setError(null);
+      const response = await axios.put(`/proveedores/${id}/estado`, { estado: nuevoEstado });
+      setProveedores(prev =>
+        prev.map(p => p._id === id ? { ...p, estado: nuevoEstado } : p)
+      );
+      return response.data;
+    } catch (err) {
+      console.error('Error cambiando estado del proveedor:', err.response || err);
+      setError(err.response?.data?.message || 'Error al cambiar el estado');
+      throw err;
+    }
+  };
+
   return {
     proveedores,
     loading,
@@ -121,6 +136,7 @@ export const useProveedores = () => {
     handleAddProveedor,
     handleEditProveedor,
     handleDeleteProveedor,
-    refreshProveedores: fetchProveedores
+    refreshProveedores: fetchProveedores,
+   handleChangeEstadoProveedor
   };
 }; 

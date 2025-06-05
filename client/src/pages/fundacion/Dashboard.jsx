@@ -265,6 +265,7 @@ const Dashboard = () => {
                 handleOpenProveedorForm(proveedor);
               }}
               onDelete={handleDeleteProveedor}
+              
             />
           </div>
           <div className="bg-white rounded-xl shadow-sm p-6">
