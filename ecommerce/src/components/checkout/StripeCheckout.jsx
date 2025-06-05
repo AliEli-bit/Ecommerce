@@ -13,10 +13,10 @@ const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLIC_KEY);
 const CARD_ELEMENT_OPTIONS = {
   style: {
     base: {
-      color: '#0f172a',
+      color: '#1f2937',
       fontFamily: '"Inter", sans-serif',
       fontSize: '16px',
-      '::placeholder': { color: '#94a3b8' },
+      '::placeholder': { color: '#9ca3af' },
     },
     invalid: {
       color: '#ef4444',
@@ -136,11 +136,13 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
     return (
       <div className="p-6 text-center">
         <CheckCircle className="w-16 h-16 text-green-500 mx-auto mb-4" />
-        <h2 className="text-2xl font-bold text-[#0f172a] mb-2">¡Pago Exitoso!</h2>
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent mb-2">
+          ¡Pago Exitoso!
+        </h2>
         <p className="text-gray-600 mb-4">Tu compra ha sido procesada correctamente.</p>
         <button
           onClick={() => onClose()}
-          className="bg-[#0f172a] text-white px-6 py-2 rounded-lg hover:bg-[#1e293b] transition"
+          className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white px-6 py-2 rounded-xl transition-all duration-300"
         >
           Cerrar
         </button>
@@ -151,23 +153,29 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4 flex flex-col">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-2xl font-bold text-[#0f172a]">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
           {step === 'info' ? 'Información de Envío' : 'Información de Pago'}
         </h2>
-        <button onClick={onClose} type="button" className="text-gray-500 hover:text-gray-700">✕</button>
+        <button 
+          onClick={onClose} 
+          type="button" 
+          className="text-gray-500 hover:text-gray-700 transition-colors duration-300"
+        >
+          ✕
+        </button>
       </div>
 
       {step === 'info' && (
         <>
           {['nombre', 'email', 'telefono', 'calle', 'ciudad', 'estado', 'codigoPostal'].map((campo, idx) => (
             <div key={idx}>
-              <label className="block text-sm font-medium text-[#0f172a] mb-1 capitalize">{campo}</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">{campo}</label>
               <input
                 type={campo === 'email' ? 'email' : 'text'}
                 name={campo}
                 value={datosEnvio[campo]}
                 onChange={handleInputChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0f172a] focus:border-[#0f172a]"
+                className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition shadow-sm"
                 required
               />
             </div>
@@ -178,33 +186,33 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
       {step === 'payment' && (
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[#0f172a] mb-1">
+            <label className="block text-sm font-medium text-gray-700 mb-1">
               Datos de la Tarjeta
             </label>
-            <div className="px-3 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#0f172a] focus:border-[#0f172a] bg-white">
+            <div className="px-3 py-3 border border-gray-200 rounded-xl focus-within:ring-2 focus-within:ring-orange-500 focus-within:border-transparent bg-white shadow-sm">
               <CardElement options={CARD_ELEMENT_OPTIONS} />
             </div>
           </div>
 
-          <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-            <div className="flex justify-between text-sm">
+          <div className="bg-gray-50/80 backdrop-blur-sm p-4 rounded-xl space-y-2">
+            <div className="flex justify-between text-sm text-gray-600">
               <span>Subtotal:</span>
               <span>${desglose.subtotal.toFixed(2)}</span>
             </div>
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-sm text-gray-600">
               <span>Envío:</span>
               <span>{desglose.envio === 0 ? 'Gratis' : `$${desglose.envio.toFixed(2)}`}</span>
             </div>
-            <div className="flex justify-between font-bold text-lg pt-2 border-t">
-              <span>Total:</span>
-              <span>${total.toFixed(2)}</span>
+            <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
+              <span className="text-gray-900">Total:</span>
+              <span className="text-gray-900">${total.toFixed(2)}</span>
             </div>
           </div>
         </div>
       )}
 
       {error && (
-        <div className="flex items-center text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg px-4 py-3">
+        <div className="flex items-center text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
           <AlertCircle className="w-5 h-5 mr-2" />
           {error}
         </div>
@@ -214,7 +222,7 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
         <button
           type="submit"
           disabled={loading || (step === 'payment' && !stripe)}
-          className="w-full bg-[#0f172a] text-white py-3 rounded-lg hover:bg-[#1e293b] transition font-medium flex items-center justify-center"
+          className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white py-3 rounded-xl transition-all duration-300 font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading && <Loader2 className="animate-spin w-4 h-4 mr-2" />}
           {step === 'info' ? 'Continuar al Pago' : `Pagar $${total.toFixed(2)}`}
@@ -224,7 +232,7 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
           <button
             type="button"
             onClick={() => setStep('info')}
-            className="mt-2 w-full text-[#0f172a] border border-gray-300 py-2 rounded-lg hover:bg-gray-100"
+            className="mt-2 w-full text-gray-700 border border-gray-200 py-2 rounded-xl hover:bg-gray-50 transition-colors duration-300"
             disabled={loading}
           >
             Regresar

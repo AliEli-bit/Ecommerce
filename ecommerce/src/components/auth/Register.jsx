@@ -70,20 +70,24 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
       <Header />
       <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <Card className="w-full max-w-md shadow-lg rounded-2xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">Crear Cuenta</CardTitle>
-            <CardDescription>Únete a nuestra comunidad y genera impacto</CardDescription>
+        <Card className="w-full max-w-md shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-4">
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Crear Cuenta
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              Únete a nuestra comunidad y genera impacto
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="name" className="text-sm font-medium">Nombre completo</label>
+              <div className="space-y-2">
+                <label htmlFor="name" className="text-sm font-medium text-gray-700">Nombre completo</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+                  <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     id="name"
                     name="name"
@@ -91,15 +95,15 @@ export default function Register() {
                     required
                     value={formData.name}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition shadow-sm"
                     placeholder="Tu nombre"
                   />
                 </div>
               </div>
-              <div>
-                <label htmlFor="email" className="text-sm font-medium">Correo electrónico</label>
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium text-gray-700">Correo electrónico</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     id="email"
                     name="email"
@@ -107,15 +111,15 @@ export default function Register() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition shadow-sm"
                     placeholder="ejemplo@correo.com"
                   />
                 </div>
               </div>
-              <div>
-                <label htmlFor="password" className="text-sm font-medium">Contraseña</label>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium text-gray-700">Contraseña</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     id="password"
                     name="password"
@@ -123,15 +127,15 @@ export default function Register() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition shadow-sm"
                     placeholder="••••••••"
                   />
                 </div>
               </div>
-              <div>
-                <label htmlFor="confirmPassword" className="text-sm font-medium">Confirmar contraseña</label>
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirmar contraseña</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
@@ -139,39 +143,58 @@ export default function Register() {
                     required
                     value={formData.confirmPassword}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition shadow-sm"
                     placeholder="••••••••"
                   />
                 </div>
               </div>
-              {error && <div className="text-sm text-red-500 text-center">{error}</div>}
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600 text-center">{error}</p>
+                </div>
+              )}
               <Button 
                 type="submit" 
-                className="w-full bg-blue-700 hover:bg-blue-600 transition flex items-center justify-center" 
+                className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2" 
                 disabled={loading}
               >
-                {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : <ArrowRight className="ml-2 h-5 w-5" />}
-                {loading ? "Creando cuenta..." : "Crear Cuenta"}
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin h-5 w-5" />
+                    <span>Creando cuenta...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Crear Cuenta</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </>
+                )}
               </Button>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 text-center">
             <p className="text-sm text-gray-600">
               ¿Ya tienes una cuenta?{" "}
-              <Link to="/login" className="text-blue-600 hover:underline">
+              <Link 
+                to="/login" 
+                className="text-orange-600 hover:text-orange-700 font-medium transition-colors duration-300"
+              >
                 Inicia sesión
               </Link>
             </p>
             <div className="relative w-full">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-xs uppercase">
                 <span className="bg-white px-2 text-gray-500">O continúa con</span>
               </div>
             </div>
             <div className="grid grid-cols-2 gap-4 w-full">
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full border-gray-200 hover:bg-gray-50 transition-colors duration-300"
+              >
                 <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                   <path
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -192,7 +215,10 @@ export default function Register() {
                 </svg>
                 Google
               </Button>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full border-gray-200 hover:bg-gray-50 transition-colors duration-300"
+              >
                 <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
                 </svg>

@@ -36,30 +36,29 @@ const Products = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
       {/* Header */}
-      <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
+      <header className="bg-white/80 backdrop-blur-sm shadow-sm fixed top-0 left-0 right-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-          <h1 className="text-2xl font-bold text-[#0f172a]">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             Productos
           </h1>
-          
         </div>
       </header>
 
       {/* Filters */}
-      <div className="bg-white shadow-sm mt-16">
+      <div className="bg-white/80 backdrop-blur-sm shadow-sm mt-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
             <div className="flex items-center gap-2">
-              <Filter className="w-5 h-5 text-[#0f172a]" />
-              <span className="text-sm font-medium text-[#0f172a]">Filtrar por:</span>
+              <Filter className="w-5 h-5 text-gray-600" />
+              <span className="text-sm font-medium text-gray-700">Filtrar por:</span>
             </div>
             <div className="flex flex-wrap gap-4">
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f172a] focus:border-[#0f172a]"
+                className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               >
                 {categories.map(category => (
                   <option key={category.id} value={category.id}>
@@ -70,7 +69,7 @@ const Products = () => {
               <select
                 value={priceRange}
                 onChange={(e) => setPriceRange(e.target.value)}
-                className="bg-white border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0f172a] focus:border-[#0f172a]"
+                className="bg-white border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition"
               >
                 {priceRanges.map(range => (
                   <option key={range.id} value={range.id}>
@@ -83,7 +82,7 @@ const Products = () => {
                   variant="outline"
                   size="sm"
                   onClick={clearFilters}
-                  className="text-sm"
+                  className="text-sm border-gray-200 hover:bg-gray-50 transition-colors duration-300"
                 >
                   Limpiar filtros
                 </Button>
@@ -98,22 +97,25 @@ const Products = () => {
         <div className="max-w-7xl mx-auto">
           {loading ? (
             <div className="flex justify-center items-center h-64">
-              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-[#0f172a]"></div>
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-orange-500"></div>
             </div>
           ) : error ? (
-            <div className="text-center text-red-500 bg-white rounded-lg shadow-sm p-8">
+            <div className="text-center text-red-500 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-8">
               <p className="text-xl mb-4">{error}</p>
-              <Button onClick={fetchProducts} className="bg-[#0f172a] text-white hover:bg-[#1e293b]">
+              <Button 
+                onClick={fetchProducts} 
+                className="bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white"
+              >
                 Reintentar
               </Button>
             </div>
           ) : products.length === 0 ? (
-            <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+            <div className="text-center py-12 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm">
               <p className="text-xl text-gray-600 mb-4">No hay productos disponibles con los filtros seleccionados</p>
               <Button
                 onClick={clearFilters}
                 variant="outline"
-                className="text-[#0f172a] hover:text-[#1e293b]"
+                className="text-gray-700 hover:text-gray-900 border-gray-200 hover:bg-gray-50 transition-colors duration-300"
               >
                 Limpiar filtros
               </Button>
@@ -132,7 +134,7 @@ const Products = () => {
                   return (
                     <div 
                       key={product.id} 
-                      className="bg-white rounded-lg shadow-md p-4 hover:shadow-xl transition-shadow duration-300 relative group"
+                      className="bg-white/80 backdrop-blur-sm rounded-xl shadow-md p-4 hover:shadow-xl transition-all duration-300 relative group"
                     >
                       {/* Badge de stock */}
                       {product.stock <= 5 && product.stock > 0 && (
@@ -152,16 +154,15 @@ const Products = () => {
                         <img
                           src={product.image || "/placeholder.svg"}
                           alt={product.name}
-                          className={`w-full h-48 object-cover rounded-md transition-all duration-300 ${
+                          className={`w-full h-48 object-cover rounded-lg transition-all duration-300 ${
                             product.stock === 0 ? 'grayscale opacity-50' : 'group-hover:scale-105'
                           }`}
                         />
                         
                         {/* Botón de favoritos */}
                         <button 
-                          className="absolute top-2 right-2 p-2 bg-white rounded-full shadow-md hover:bg-red-50 transition-colors"
+                          className="absolute top-2 right-2 p-2 bg-white/80 backdrop-blur-sm rounded-full shadow-md hover:bg-red-50 transition-colors"
                           onClick={() => {
-                            // Aquí puedes agregar la lógica de favoritos
                             console.log('Agregar a favoritos:', product.name);
                           }}
                         >
@@ -171,7 +172,7 @@ const Products = () => {
 
                       {/* Información del producto */}
                       <div className="space-y-2">
-                        <h2 className="text-lg font-semibold text-[#0f172a] line-clamp-2 min-h-[3rem]">
+                        <h2 className="text-lg font-semibold text-gray-900 line-clamp-2 min-h-[3rem]">
                           {product.name}
                         </h2>
                         
@@ -182,8 +183,8 @@ const Products = () => {
                         {/* Precio y unidad */}
                         <div className="flex items-center justify-between">
                           <div>
-                            <p className="text-xl font-bold text-[#0f172a]">
-                              ${product.price}
+                            <p className="text-xl font-bold text-gray-900">
+                              {product.price} Bs.
                             </p>
                             <p className="text-xs text-gray-500">
                               por {product.unit}
@@ -191,7 +192,7 @@ const Products = () => {
                           </div>
                           
                           {/* Badge de categoría */}
-                          <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded-full">
+                          <span className="px-2 py-1 bg-orange-100 text-orange-800 text-xs rounded-full">
                             {product.category}
                           </span>
                         </div>
@@ -215,7 +216,7 @@ const Products = () => {
                                   );
                                 }}
                                 disabled={product.stock === 0}
-                                className="flex-1"
+                                className="flex-1 border-gray-200 hover:bg-gray-50 transition-colors duration-300"
                               >
                                 <Plus className="w-4 h-4 mr-1" />
                                 Agregar más
@@ -229,7 +230,7 @@ const Products = () => {
                             <Button
                               onClick={() => handleAddToCart(product)}
                               disabled={product.stock === 0}
-                              className="w-full bg-[#0f172a] text-white hover:bg-[#1e293b] disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                              className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white disabled:bg-gray-300 disabled:cursor-not-allowed transition-all duration-300"
                             >
                               {product.stock === 0 ? (
                                 'Agotado'
@@ -242,8 +243,6 @@ const Products = () => {
                             </Button>
                           )}
                         </div>
-
-
                       </div>
                     </div>
                   );
@@ -251,13 +250,13 @@ const Products = () => {
               </div>
 
               {/* Información adicional */}
-              <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
-                <h3 className="text-lg font-semibold text-[#0f172a] mb-4">
+              <div className="mt-8 bg-white/80 backdrop-blur-sm rounded-xl shadow-sm p-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Información de Compra
                 </h3>
                 <div className="grid md:grid-cols-3 gap-4 text-sm">
                   <div className="flex items-center gap-2">
-                    <ShoppingCart className="w-5 h-5 text-blue-600" />
+                    <ShoppingCart className="w-5 h-5 text-orange-500" />
                     <span>Envío gratis en pedidos mayores a $500</span>
                   </div>
                   <div className="flex items-center gap-2">
@@ -276,7 +275,6 @@ const Products = () => {
       </div>
       
       <CarritoMejorado />
-      
     </div>
   );
 };

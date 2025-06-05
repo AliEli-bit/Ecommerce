@@ -53,37 +53,52 @@ export const useProductos = () => {
     fetchProductos();
   }, []);
 
-  const handleAddProducto = async (productoData, imagenFile = null) => {
+  // Función para crear solo los datos del producto (sin imagen)
+  const handleAddProducto = async (productoData) => {
     try {
-      console.log('Adding producto:', productoData);
+      console.log('=== ADDING PRODUCTO (DATOS SOLAMENTE) ===');
+      console.log('Producto data:', productoData);
+      
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No se encontró token de autenticación');
       }
 
-      // Crear FormData para enviar archivos
-      const formData = new FormData();
-      
-      // Agregar todos los campos del producto al FormData
-      Object.keys(productoData).forEach(key => {
-        if (productoData[key] !== null && productoData[key] !== undefined) {
-          formData.append(key, productoData[key]);
-        }
+      // Validar campos requeridos
+      const requiredFields = ['nombre', 'descripcion', 'precio', 'unidad', 'stock', 'categoria', 'proveedor'];
+      const missingFields = requiredFields.filter(field => {
+        const value = productoData[field];
+        return !value || value === '' || value.toString().trim() === '';
       });
-
-      // Agregar la imagen si existe
-      if (imagenFile) {
-        formData.append('imagen', imagenFile);
+      
+      if (missingFields.length > 0) {
+        throw new Error(`Los siguientes campos son requeridos: ${missingFields.join(', ')}`);
       }
 
-      const response = await axios.post(`${API_URL}/productos`, formData, {
+      // Crear objeto con datos limpios
+      const cleanData = {
+        nombre: productoData.nombre.trim(),
+        descripcion: productoData.descripcion.trim(),
+        precio: Number(productoData.precio),
+        unidad: productoData.unidad,
+        stock: Number(productoData.stock),
+        categoria: productoData.categoria,
+        proveedor: productoData.proveedor,
+        estado: productoData.estado || 'activo'
+      };
+
+      console.log('Clean data to send:', cleanData);
+
+      const response = await axios.post(`${API_URL}/productos`, cleanData, {
         headers: {
           'Authorization': `Bearer ${token}`,
-          'Content-Type': 'multipart/form-data'
+          'Content-Type': 'application/json'
         }
       });
       
       console.log('Add producto response:', response.data);
+      
+      // Agregar el producto a la lista local
       setProductos(prev => [...prev, response.data]);
       return response.data;
     } catch (err) {
@@ -92,39 +107,111 @@ export const useProductos = () => {
     }
   };
 
-  const handleEditProducto = async (id, productoData, imagenFile = null) => {
+  // Función separada para subir imagen
+  const handleUploadImagen = async (productoId, imagenFile) => {
     try {
-      console.log('Editing producto:', id, productoData);
+      console.log('=== UPLOADING IMAGEN ===');
+      console.log('Producto ID:', productoId);
+      console.log('Image file:', imagenFile);
+      
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No se encontró token de autenticación');
       }
 
-      // Crear FormData para enviar archivos
-      const formData = new FormData();
-      
-      // Agregar todos los campos del producto al FormData
-      Object.keys(productoData).forEach(key => {
-        if (productoData[key] !== null && productoData[key] !== undefined) {
-          formData.append(key, productoData[key]);
-        }
-      });
-
-      // Agregar la imagen si existe (nueva imagen)
-      if (imagenFile) {
-        formData.append('imagen', imagenFile);
+      if (!imagenFile) {
+        throw new Error('No se proporcionó archivo de imagen');
       }
 
-      const response = await axios.put(`${API_URL}/productos/${id}`, formData, {
+      const formData = new FormData();
+      formData.append('imagen', imagenFile);
+
+      console.log('FormData para imagen creado');
+
+      const response = await axios.post(`${API_URL}/productos/${productoId}/imagen`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'
         }
       });
+
+      console.log('Upload imagen response:', response.data);
       
-      console.log('Edit producto response:', response.data);
-      setProductos(prev => prev.map(p => p._id === id ? response.data : p));
+      // Actualizar el producto en la lista local con las nuevas imágenes
+      setProductos(prev => prev.map(p => 
+        p._id === productoId ? response.data : p
+      ));
+      
       return response.data;
+    } catch (err) {
+      console.error('Error uploading imagen:', err.response || err);
+      throw err;
+    }
+  };
+
+  const handleEditProducto = async (id, productoData, imagenFile = null) => {
+    try {
+      console.log('=== EDITING PRODUCTO ===');
+      console.log('ID:', id);
+      console.log('Data:', productoData);
+      console.log('Image file:', imagenFile);
+      
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No se encontró token de autenticación');
+      }
+
+      // Si hay imagen, usar FormData; si no, usar JSON
+      if (imagenFile) {
+        const formData = new FormData();
+        
+        // Agregar todos los campos del producto al FormData
+        Object.keys(productoData).forEach(key => {
+          const value = productoData[key];
+          if (value !== null && value !== undefined && value !== '') {
+            const finalValue = (key === 'precio' || key === 'stock') ? 
+              Number(value).toString() : value.toString();
+            formData.append(key, finalValue);
+          }
+        });
+
+        // Agregar la imagen
+        formData.append('imagen', imagenFile);
+
+        const response = await axios.put(`${API_URL}/productos/${id}`, formData, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data'
+          }
+        });
+        
+        console.log('Edit producto with image response:', response.data);
+        setProductos(prev => prev.map(p => p._id === id ? response.data : p));
+        return response.data;
+      } else {
+        // Solo actualizar datos, sin imagen
+        const cleanData = {
+          nombre: productoData.nombre.trim(),
+          descripcion: productoData.descripcion.trim(),
+          precio: Number(productoData.precio),
+          unidad: productoData.unidad,
+          stock: Number(productoData.stock),
+          categoria: productoData.categoria,
+          proveedor: productoData.proveedor,
+          estado: productoData.estado || 'activo'
+        };
+
+        const response = await axios.put(`${API_URL}/productos/${id}`, cleanData, {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+        
+        console.log('Edit producto response:', response.data);
+        setProductos(prev => prev.map(p => p._id === id ? response.data : p));
+        return response.data;
+      }
     } catch (err) {
       console.error('Error editing producto:', err.response || err);
       throw err;
@@ -133,7 +220,7 @@ export const useProductos = () => {
 
   const handleDeleteProducto = async (id) => {
     try {
-      console.log('Deleting producto:', id);
+      console.log('=== DELETING PRODUCTO ===', id);
       const token = localStorage.getItem('token');
       if (!token) {
         throw new Error('No se encontró token de autenticación');
@@ -157,6 +244,7 @@ export const useProductos = () => {
     loading,
     error,
     handleAddProducto,
+    handleUploadImagen, // Nueva función separada para subir imágenes
     handleEditProducto,
     handleDeleteProducto,
     refreshProductos: fetchProductos

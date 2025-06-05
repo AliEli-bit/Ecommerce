@@ -75,7 +75,7 @@ const CarritoMejorado = () => {
   const CartButton = () => (
     <button
       onClick={() => setIsCartOpen(true)}
-      className="fixed bottom-6 right-6 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 z-40 flex items-center gap-2"
+      className="fixed bottom-6 right-6 bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white p-4 rounded-full shadow-lg transition-all duration-300 z-40 flex items-center gap-2"
     >
       <ShoppingCart className="w-6 h-6" />
       {cantidadItems > 0 && (
@@ -91,7 +91,7 @@ const CarritoMejorado = () => {
       {notifications.map(notification => (
         <div
           key={notification.id}
-          className={`px-4 py-2 rounded-lg shadow-lg text-white text-sm transition-all duration-300 ${
+          className={`px-4 py-2 rounded-xl shadow-lg text-white text-sm transition-all duration-300 ${
             notification.type === 'error' 
               ? 'bg-red-500' 
               : 'bg-green-500'
@@ -119,16 +119,16 @@ const CarritoMejorado = () => {
       {/* Fondo opaco al hacer clic para cerrar */}
       {!isCheckoutOpen && (
         <div 
-          className="fixed inset-0.5 z-40"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40"
           onClick={() => setIsCartOpen(false)}
         />
       )}
 
       {/* Panel derecho */}
-      <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-white shadow-xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col">
+      <div className="fixed right-0 top-0 h-full w-full max-w-lg bg-white/95 backdrop-blur-sm shadow-xl z-50 transform transition-transform duration-300 ease-in-out flex flex-col">
         {/* Encabezado */}
-        <div className="flex items-center justify-between p-6 border-b">
-          <h2 className="text-xl font-bold text-gray-900">
+        <div className="flex items-center justify-between p-6 border-b border-gray-200">
+          <h2 className="text-xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             {isCheckoutOpen ? 'Finalizar Compra' : 'Carrito de Compras'}
           </h2>
           <button
@@ -139,9 +139,9 @@ const CarritoMejorado = () => {
                 setIsCartOpen(false);
               }
             }}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors duration-300"
           >
-            <X className="w-5 h-5" />
+            <X className="w-5 h-5 text-gray-600" />
           </button>
         </div>
 
@@ -162,10 +162,10 @@ const CarritoMejorado = () => {
           ) : (
             loading ? (
               <div className="flex justify-center items-center h-32">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-orange-500"></div>
               </div>
             ) : error ? (
-              <div className="p-6 text-center text-red-500">
+              <div className="p-6 text-center text-red-500 bg-red-50/80 backdrop-blur-sm rounded-xl mx-4">
                 <p>{error}</p>
               </div>
             ) : items.length === 0 ? (
@@ -181,9 +181,9 @@ const CarritoMejorado = () => {
                 {items.map((item) => (
                   <div
                     key={item.producto._id || item.producto.id}
-                    className="flex items-center space-x-4 p-4 border rounded-lg hover:shadow-md transition-shadow"
+                    className="flex items-center space-x-4 p-4 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl hover:shadow-md transition-all duration-300"
                   >
-                    <div className="w-16 h-16 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                       {item.producto.imagenes && item.producto.imagenes.length > 0 ? (
                         <img
                           src={item.producto.imagenes[0].url}
@@ -201,10 +201,10 @@ const CarritoMejorado = () => {
                       <h3 className="font-medium text-gray-900 truncate">
                         {item.producto.nombre}
                       </h3>
-                      <p className="text-sm text-gray-500">
+                      <p className="text-sm text-gray-600">
                         {formatPrice(item.precioUnitario)} por {item.producto.unidad}
                       </p>
-                      <p className="text-sm font-medium text-blue-600">
+                      <p className="text-sm font-medium text-orange-600">
                         Subtotal: {formatPrice(item.subtotal)}
                       </p>
                     </div>
@@ -215,12 +215,12 @@ const CarritoMejorado = () => {
                           item.producto._id || item.producto.id,
                           item.cantidad - 1
                         )}
-                        className="p-1 hover:bg-gray-100 rounded transition-colors"
+                        className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-300"
                       >
-                        <Minus className="w-4 h-4" />
+                        <Minus className="w-4 h-4 text-gray-600" />
                       </button>
                       
-                      <span className="w-12 text-center font-medium">
+                      <span className="w-12 text-center font-medium text-gray-700">
                         {item.cantidad}
                       </span>
                       
@@ -229,9 +229,9 @@ const CarritoMejorado = () => {
                           item.producto._id || item.producto.id,
                           item.cantidad + 1
                         )}
-                        className="p-1 hover:bg-gray-100 rounded transition-colors"
+                        className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-300"
                       >
-                        <Plus className="w-4 h-4" />
+                        <Plus className="w-4 h-4 text-gray-600" />
                       </button>
                       
                       <button
@@ -239,7 +239,7 @@ const CarritoMejorado = () => {
                           item.producto._id || item.producto.id,
                           item.producto.nombre
                         )}
-                        className="p-1 hover:bg-red-100 text-red-500 rounded transition-colors ml-2"
+                        className="p-1 hover:bg-red-50 text-red-500 rounded-lg transition-colors duration-300 ml-2"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -253,13 +253,13 @@ const CarritoMejorado = () => {
 
         {/* Pie de carrito (solo cuando no está en checkout) */}
         {!isCheckoutOpen && items.length > 0 && (
-          <div className="border-t p-6 space-y-4 bg-gray-50">
+          <div className="border-t border-gray-200 p-6 space-y-4 bg-gray-50/80 backdrop-blur-sm">
             <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
+              <div className="flex justify-between text-gray-600">
                 <span>Subtotal:</span>
                 <span>{formatPrice(totales.subtotal)}</span>
               </div>
-              <div className="flex justify-between">
+              <div className="flex justify-between text-gray-600">
                 <span>Envío:</span>
                 <span>
                   {totales.envio === 0 ? (
@@ -269,16 +269,16 @@ const CarritoMejorado = () => {
                   )}
                 </span>
               </div>
-              <div className="border-t pt-2 flex justify-between font-bold text-lg">
-                <span>Total:</span>
-                <span className="text-blue-600">{formatPrice(totales.total)}</span>
+              <div className="border-t border-gray-200 pt-2 flex justify-between font-bold text-lg">
+                <span className="text-gray-900">Total:</span>
+                <span className="text-orange-600">{formatPrice(totales.total)}</span>
               </div>
             </div>
 
             <div className="space-y-2">
               <Button
                 onClick={() => setIsCheckoutOpen(true)}
-                className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white"
               >
                 <div className="flex items-center gap-2">
                   <CreditCard className="w-4 h-4" />
@@ -289,7 +289,7 @@ const CarritoMejorado = () => {
               <Button
                 variant="outline"
                 onClick={() => setIsCartOpen(false)}
-                className="w-full"
+                className="w-full border-gray-200 hover:bg-gray-50 transition-colors duration-300"
               >
                 Continuar Comprando
               </Button>
@@ -298,7 +298,7 @@ const CarritoMejorado = () => {
                 <Button
                   variant="ghost"
                   onClick={vaciarCarrito}
-                  className="w-full text-red-500 hover:text-red-700 hover:bg-red-50"
+                  className="w-full text-red-500 hover:text-red-700 hover:bg-red-50 transition-colors duration-300"
                 >
                   Vaciar Carrito
                 </Button>
@@ -306,7 +306,7 @@ const CarritoMejorado = () => {
             </div>
 
             {totales.subtotal < 500 && (
-              <div className="text-xs text-gray-500 text-center p-2 bg-yellow-50 rounded">
+              <div className="text-xs text-gray-600 text-center p-2 bg-orange-50/80 backdrop-blur-sm rounded-xl">
                 Agrega {formatPrice(500 - totales.subtotal)} más para obtener envío gratuito
               </div>
             )}

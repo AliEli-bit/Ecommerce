@@ -13,6 +13,7 @@ import ProveedorDashboard from './pages/proveedor/Dashboard';
 import Proveedores from './pages/admin/Proveedores';
 import Fundaciones from './pages/admin/Fundaciones';
 import Reportes from './pages/admin/Reportes';
+import Usuarios from './pages/admin/Usuarios';
 
 // Tema personalizado
 const theme = createTheme({
@@ -70,7 +71,7 @@ const App = () => {
                     <Route path="proveedores" element={<Proveedores />} />
                     <Route path="fundaciones" element={<Fundaciones />} />
                     <Route path="reportes" element={<Reportes />} />
-                    <Route path="*" element={<Navigate to="/admin/dashboard" replace />} />
+                    <Route path="usuarios" element={<Usuarios />} />
                   </Routes>
                 </PrivateRoute>
               }

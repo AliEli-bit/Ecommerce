@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import Header from "@/components/layout/Header";
@@ -70,20 +70,26 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-100">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 via-white to-gray-50/50">
       <Header />
       <main className="flex-1 flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <Card className="w-full max-w-md shadow-lg rounded-2xl">
-          <CardHeader className="text-center">
-            <CardTitle className="text-3xl font-bold">Iniciar Sesión</CardTitle>
-            <CardDescription>Accede a tu cuenta con tus credenciales</CardDescription>
+        <Card className="w-full max-w-md shadow-xl rounded-2xl border-0 bg-white/80 backdrop-blur-sm">
+          <CardHeader className="text-center space-y-4">
+            <div className="flex justify-center">
+            </div>
+            <CardTitle className="text-3xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Bienvenido de nuevo
+            </CardTitle>
+            <CardDescription className="text-gray-600">
+              Accede a tu cuenta para continuar
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div>
-                <label htmlFor="email" className="text-sm font-medium">Correo electrónico</label>
+              <div className="space-y-2">
+                <label htmlFor="email" className="text-sm font-medium text-gray-700">Correo electrónico</label>
                 <div className="relative">
-                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+                  <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     id="email"
                     name="email"
@@ -91,15 +97,15 @@ export default function Login() {
                     required
                     value={formData.email}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition shadow-sm"
                     placeholder="ejemplo@correo.com"
                   />
                 </div>
               </div>
-              <div>
-                <label htmlFor="password" className="text-sm font-medium">Contraseña</label>
+              <div className="space-y-2">
+                <label htmlFor="password" className="text-sm font-medium text-gray-700">Contraseña</label>
                 <div className="relative">
-                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-500" />
+                  <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   <input
                     id="password"
                     name="password"
@@ -107,21 +113,45 @@ export default function Login() {
                     required
                     value={formData.password}
                     onChange={handleChange}
-                    className="w-full pl-10 pr-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition shadow-sm"
+                    className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition shadow-sm"
                     placeholder="••••••••"
                   />
                 </div>
               </div>
-              {error && <div className="text-sm text-red-500 text-center">{error}</div>}
-              <Button type="submit" className="w-full bg-blue-700 hover:bg-blue-600 transition flex items-center justify-center" disabled={loading}>
-                {loading ? <Loader2 className="animate-spin h-5 w-5 mr-2" /> : null}
-                {loading ? "Iniciando..." : "Iniciar Sesión"}
-                {!loading && <ArrowRight className="ml-2 h-5 w-5" />}
+              {error && (
+                <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                  <p className="text-sm text-red-600 text-center">{error}</p>
+                </div>
+              )}
+              <Button 
+                type="submit" 
+                className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white py-3 rounded-xl transition-all duration-300 flex items-center justify-center gap-2" 
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="animate-spin h-5 w-5" />
+                    <span>Iniciando sesión...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>Iniciar Sesión</span>
+                    <ArrowRight className="h-5 w-5" />
+                  </>
+                )}
               </Button>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4 text-center">
-            <p className="text-sm text-gray-600">¿No tienes una cuenta? <Link to="/register" className="text-blue-600 hover:underline">Regístrate</Link></p>
+            <p className="text-sm text-gray-600">
+              ¿No tienes una cuenta?{" "}
+              <Link 
+                to="/register" 
+                className="text-orange-600 hover:text-orange-700 font-medium transition-colors duration-300"
+              >
+                Regístrate aquí
+              </Link>
+            </p>
           </CardFooter>
         </Card>
       </main>

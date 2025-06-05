@@ -3,7 +3,10 @@ import {
   registrarUsuario,
   autenticarUsuario,
   obtenerPerfil,
-  actualizarPerfil
+  actualizarPerfil,
+  obtenerUsuarios,
+  actualizarUsuario,
+  eliminarUsuario
 } from '../controllers/usuario.controller.js';
 import auth from '../middlewares/auth.js';
 
@@ -14,5 +17,8 @@ router.post('/registro', registrarUsuario);
 router.post('/login', autenticarUsuario);
 router.get('/perfil', auth, obtenerPerfil);
 router.put('/perfil', auth, actualizarPerfil);
+router.get('/', auth, obtenerUsuarios);
+router.put('/:id', auth, actualizarUsuario);
+router.delete('/:id', auth, eliminarUsuario);
 
 export default router;

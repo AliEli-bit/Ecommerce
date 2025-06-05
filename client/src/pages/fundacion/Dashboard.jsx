@@ -49,6 +49,7 @@ const Dashboard = () => {
     loading: loadingProductos,
     error: errorProductos,
     handleAddProducto,
+    handleUploadImagen, // Nueva función separada
     handleEditProducto,
     handleDeleteProducto
   } = useProductos();
@@ -60,11 +61,13 @@ const Dashboard = () => {
   }, [proveedores, productos]);
 
   const handleOpenProductoForm = (producto = null) => {
+    console.log('Abriendo formulario de producto:', producto);
     setSelectedProducto(producto);
     setOpenProductoForm(true);
   };
 
   const handleCloseProductoForm = () => {
+    console.log('Cerrando formulario de producto');
     setOpenProductoForm(false);
     setSelectedProducto(null);
   };
@@ -81,11 +84,54 @@ const Dashboard = () => {
     setSelectedProveedor(null);
   };
 
-  const handleSubmitProducto = (productoData) => {
-    if (selectedProducto) {
-      handleEditProducto(selectedProducto._id, productoData);
-    } else {
-      handleAddProducto(productoData);
+  // Función para crear solo los datos del producto
+  const handleSubmitProductoDatos = async (productoData) => {
+    try {
+      console.log('=== CREAR PRODUCTO (SOLO DATOS) ===');
+      console.log('Producto data:', productoData);
+      
+      const nuevoProducto = await handleAddProducto(productoData);
+      console.log('Producto creado exitosamente:', nuevoProducto);
+      
+      return nuevoProducto;
+    } catch (error) {
+      console.error('Error al crear producto:', error);
+      throw error;
+    }
+  };
+
+  // Función para subir imagen del producto
+  const handleSubmitProductoImagen = async (productoId, imagenFile) => {
+    try {
+      console.log('=== SUBIR IMAGEN DE PRODUCTO ===');
+      console.log('Producto ID:', productoId);
+      console.log('Imagen file:', imagenFile);
+      
+      const productoActualizado = await handleUploadImagen(productoId, imagenFile);
+      console.log('Imagen subida exitosamente:', productoActualizado);
+      
+      return productoActualizado;
+    } catch (error) {
+      console.error('Error al subir imagen:', error);
+      throw error;
+    }
+  };
+
+  // Función para editar producto (con o sin imagen)
+  const handleSubmitProductoEdit = async (productoId, productoData, imagenFile = null) => {
+    try {
+      console.log('=== EDITAR PRODUCTO ===');
+      console.log('Producto ID:', productoId);
+      console.log('Producto data:', productoData);
+      console.log('Imagen file:', imagenFile);
+      
+      const productoActualizado = await handleEditProducto(productoId, productoData, imagenFile);
+      console.log('Producto editado exitosamente:', productoActualizado);
+      
+      return productoActualizado;
+    } catch (error) {
+      console.error('Error al editar producto:', error);
+      throw error;
     }
   };
 
@@ -100,7 +146,7 @@ const Dashboard = () => {
       handleCloseProveedorForm();
     } catch (error) {
       console.error('Error al guardar proveedor:', error);
-      // Aquí podrías mostrar un mensaje de error al usuario
+      throw error;
     }
   };
 
@@ -241,7 +287,9 @@ const Dashboard = () => {
       <ProductoForm
         open={openProductoForm}
         onClose={handleCloseProductoForm}
-        onSubmit={handleSubmitProducto}
+        onAddProducto={handleSubmitProductoDatos}
+        onEditProducto={handleSubmitProductoEdit}
+        onUploadImagen={handleSubmitProductoImagen}
         initialData={selectedProducto}
         proveedores={proveedores || []}
       />
@@ -255,4 +303,4 @@ const Dashboard = () => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

@@ -87,6 +87,10 @@ export const useProducts = () => {
         tags: [product.categoria],
         stock: product.stock,
         unit: product.unidad,
+        foundations: product.fundaciones ? product.fundaciones.map(foundation => ({
+          id: foundation._id,
+          name: foundation.nombre
+        })) : []
       }))
 
       console.log("Datos transformados:", transformedData)
@@ -172,11 +176,18 @@ export const useProducts = () => {
     products: filteredProducts,
     loading,
     error,
+    favorites,
+    setFavorites,
     cart,
+    setCart,
     notification,
+    setNotification,
     isCartOpen,
+    setIsCartOpen,
     selectedCategory,
+    setSelectedCategory,
     priceRange,
+    setPriceRange,
     categories,
     priceRanges,
     fetchProducts,
@@ -184,9 +195,6 @@ export const useProducts = () => {
     handleToggleFavorite,
     handleRemoveFromCart,
     handleUpdateQuantity, // ✅ Nueva función exportada
-    setIsCartOpen,
-    setSelectedCategory,
-    setPriceRange,
     clearFilters
   }
 }

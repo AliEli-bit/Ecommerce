@@ -1,5 +1,6 @@
 import Usuario from '../models/Usuario.model.js';
 import { generateToken } from '../config/jwt.js';
+import bcrypt from 'bcrypt';
 
 // Registrar un nuevo usuario
 export const registrarUsuario = async (req, res) => {
@@ -138,23 +139,107 @@ export const actualizarPerfil = async (req, res) => {
     res.status(400).json({ message: error.message });
   }
 };
+
 // Crear usuario admin al iniciar (solo en desarrollo)
-const crearAdminInicial = async () => {
+export const crearAdminInicial = async () => {
   try {
     const adminExiste = await Usuario.findOne({ email: "admin@gmail.com" });
     if (!adminExiste) {
-      await Usuario.create({
+      const admin = await Usuario.create({
         nombre: "Administrador",
         email: "admin@gmail.com",
-        password: "1234",
-        rol: "admin"
+        password:"1234", // Contraseña más segura
+        rol: "admin",
+        activo: true
       });
-      console.log("✅ Usuario admin creado: admin@gmail.com / 1234");
+      console.log("✅ Usuario admin creado exitosamente");
+      return admin;
     }
+    console.log("ℹ️ Usuario admin ya existe");
+    return adminExiste;
   } catch (error) {
-    console.error("Error creando admin:", error.message);
+    console.error("❌ Error creando admin:", error.message);
+    throw error;
   }
 };
 
-// Ejecutar al iniciar (solo en desarrollo)
-crearAdminInicial();
+// No ejecutar automáticamente, se llamará desde el archivo principal
+// crearAdminInicial();
+
+// Obtener todos los usuarios
+export const obtenerUsuarios = async (req, res) => {
+  try {
+    const usuarios = await Usuario.find().select('-password');
+    res.json(usuarios);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+export const actualizarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { nombre, email, rol, activo } = req.body;
+
+    // Verificar si el usuario existe
+    const usuario = await Usuario.findById(id);
+    if (!usuario) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' });
+    }
+
+    // Actualizar campos
+    usuario.nombre = nombre || usuario.nombre;
+    usuario.email = email || usuario.email;
+    usuario.rol = rol || usuario.rol;
+    usuario.activo = activo !== undefined ? activo : usuario.activo;
+
+    // Si se proporciona una nueva contraseña, actualizarla
+    if (req.body.password) {
+      const salt = await bcrypt.genSalt(10);
+      usuario.password = await bcrypt.hash(req.body.password, salt);
+    }
+
+    await usuario.save();
+
+    res.json({
+      msg: 'Usuario actualizado correctamente',
+      usuario: {
+        _id: usuario._id,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol,
+        activo: usuario.activo
+      }
+    });
+  } catch (error) {
+    console.error('Error al actualizar usuario:', error);
+    res.status(500).json({ msg: 'Error al actualizar el usuario' });
+  }
+};
+
+export const eliminarUsuario = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Verificar si el usuario existe
+    const usuario = await Usuario.findById(id);
+    if (!usuario) {
+      return res.status(404).json({ msg: 'Usuario no encontrado' });
+    }
+
+    // No permitir eliminar el último administrador
+    if (usuario.rol === 'admin') {
+      const adminCount = await Usuario.countDocuments({ rol: 'admin' });
+      if (adminCount <= 1) {
+        return res.status(400).json({ msg: 'No se puede eliminar el último administrador' });
+      }
+    }
+
+    await Usuario.findByIdAndDelete(id);
+
+    res.json({ msg: 'Usuario eliminado correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar usuario:', error);
+    res.status(500).json({ msg: 'Error al eliminar el usuario' });
+  }
+};
