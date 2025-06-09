@@ -6,6 +6,12 @@ const ordenItemSchema = new mongoose.Schema({
     ref: 'Producto',
     required: true
   },
+  // Agregar referencia al proveedor para consultas más eficientes
+  proveedor: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Usuario',
+    required: true
+  },
   nombre: String,
   cantidad: {
     type: Number,
@@ -81,7 +87,6 @@ const ordenSchema = new mongoose.Schema({
     enum: ['stripe', 'efectivo', 'transferencia'],
     default: 'stripe'
   },
-  // Datos de Stripe
   stripePaymentIntentId: String,
   stripeChargeId: String,
   stripePagoDetalles: {
@@ -110,6 +115,8 @@ ordenSchema.index({ numeroOrden: 1 });
 ordenSchema.index({ estadoPago: 1 });
 ordenSchema.index({ estadoEnvio: 1 });
 ordenSchema.index({ createdAt: -1 });
+// Nuevo índice para consultas por proveedor
+ordenSchema.index({ 'items.proveedor': 1 });
 
 const Orden = mongoose.models.Orden || mongoose.model('Orden', ordenSchema);
 

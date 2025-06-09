@@ -3,6 +3,7 @@ import Carrito from '../models/Carrito.model.js';
 import Producto from '../models/Producto.model.js';
 import Orden from '../models/Orden.model.js';
 import stripe from '../config/stripe.js';
+import mongoose from 'mongoose';
 
 // Obtener carrito del usuario
 export const obtenerCarrito = async (req, res) => {
@@ -446,6 +447,7 @@ export const obtenerResumenCarrito = async (req, res) => {
 };
 
 // Crear Payment Intent de Stripe
+
 export const crearPaymentIntent = async (req, res) => {
   try {
     const { direccionEnvio, datosContacto } = req.body;
@@ -458,7 +460,7 @@ export const crearPaymentIntent = async (req, res) => {
         estado: 'activo' 
       }).populate({
         path: 'items.producto',
-        select: 'nombre precio imagenes stock categoria'
+        select: 'nombre precio imagenes stock categoria proveedor'
       });
     } else {
       const sessionId = req.headers['x-session-id'];
@@ -470,7 +472,7 @@ export const crearPaymentIntent = async (req, res) => {
         estado: 'activo' 
       }).populate({
         path: 'items.producto',
-        select: 'nombre precio imagenes stock categoria'
+        select: 'nombre precio imagenes stock categoria proveedor'
       });
     }
     
@@ -478,49 +480,108 @@ export const crearPaymentIntent = async (req, res) => {
       return res.status(400).json({ message: 'El carrito está vacío' });
     }
     
-    // Verificar stock de productos
-    for (const item of carrito.items) {
-      if (item.producto.stock < item.cantidad) {
+    console.log('=== DEBUG CREACIÓN DE ORDEN ===');
+    console.log('Items en carrito:', carrito.items.length);
+    
+    // Verificar y preparar items con validación estricta
+    const itemsValidados = [];
+    
+    for (let i = 0; i < carrito.items.length; i++) {
+      const item = carrito.items[i];
+      
+      console.log(`\nItem ${i + 1}:`);
+      console.log('  Producto:', item.producto.nombre);
+      console.log('  Producto ID:', item.producto._id);
+      console.log('  Proveedor en producto:', item.producto.proveedor);
+      console.log('  Tipo proveedor:', typeof item.producto.proveedor);
+      console.log('  Stock disponible:', item.producto.stock);
+      console.log('  Cantidad solicitada:', item.cantidad);
+      
+      // Validación 1: Producto debe tener proveedor
+      if (!item.producto.proveedor) {
         return res.status(400).json({ 
-          message: `Stock insuficiente para ${item.producto.nombre}`,
-          stockDisponible: item.producto.stock
+          message: `El producto "${item.producto.nombre}" no tiene proveedor asignado`,
+          producto: item.producto.nombre
         });
       }
-    }
-    
-    // Calcular totales
-    const subtotal = carrito.total;
-    const impuestos = subtotal * 0.16; // 16% IVA
-    const envio = subtotal > 500 ? 0 : 50; // Envío gratis sobre $500
-    const total = subtotal + impuestos + envio;
-    
-    // Crear Payment Intent en Stripe
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(total * 100), // Stripe trabaja con centavos
-      currency: 'mxn',
-      metadata: {
-        carritoId: carrito._id.toString(),
-        usuarioId: req.user ? req.user._id.toString() : 'invitado',
-        items: JSON.stringify(carrito.items.map(item => ({
-          productoId: item.producto._id,
-          nombre: item.producto.nombre,
-          cantidad: item.cantidad,
-          precio: item.precioUnitario
-        })))
+      
+      // Validación 2: Stock suficiente
+      if (item.producto.stock < item.cantidad) {
+        return res.status(400).json({ 
+          message: `Stock insuficiente para "${item.producto.nombre}"`,
+          stockDisponible: item.producto.stock,
+          cantidadSolicitada: item.cantidad
+        });
       }
-    });
-    
-    // Crear orden pendiente
-    const orden = await Orden.create({
-      numeroOrden: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
-      usuario: req.user ? req.user._id : null,
-      items: carrito.items.map(item => ({
-        producto: item.producto._id,
+      
+      // Validación 3: Proveedor debe ser ObjectId válido
+      let proveedorId = item.producto.proveedor;
+      
+      if (typeof proveedorId === 'string') {
+        if (!mongoose.Types.ObjectId.isValid(proveedorId)) {
+          return res.status(400).json({ 
+            message: `ID de proveedor inválido para producto "${item.producto.nombre}": ${proveedorId}`
+          });
+        }
+        proveedorId = new mongoose.Types.ObjectId(proveedorId);
+      } else if (!mongoose.Types.ObjectId.isValid(proveedorId)) {
+        return res.status(400).json({ 
+          message: `Proveedor debe ser un ObjectId válido para producto "${item.producto.nombre}"`
+        });
+      }
+      
+      console.log('  Proveedor final (ObjectId):', proveedorId);
+      console.log('  Es ObjectId válido:', mongoose.Types.ObjectId.isValid(proveedorId));
+      
+      // Crear item validado
+      const itemValidado = {
+        producto: new mongoose.Types.ObjectId(item.producto._id),
+        proveedor: proveedorId, // Ya validado como ObjectId
         nombre: item.producto.nombre,
         cantidad: item.cantidad,
         precioUnitario: item.precioUnitario,
         subtotal: item.subtotal
-      })),
+      };
+      
+      itemsValidados.push(itemValidado);
+    }
+    
+    console.log('\nItems validados:', itemsValidados.length);
+    console.log('Todos los proveedores:');
+    itemsValidados.forEach((item, index) => {
+      console.log(`  Item ${index + 1} - Proveedor: ${item.proveedor} (${typeof item.proveedor})`);
+    });
+    
+    // Calcular totales
+    const subtotal = carrito.total;
+    const impuestos = subtotal * 0.16;
+    const envio = subtotal > 500 ? 0 : 50;
+    const total = subtotal + impuestos + envio;
+    
+    // Crear Payment Intent en Stripe
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: Math.round(total * 100),
+      currency: 'mxn',
+      metadata: {
+        carritoId: carrito._id.toString(),
+        usuarioId: req.user ? req.user._id.toString() : 'invitado',
+        items: JSON.stringify(itemsValidados.map(item => ({
+          productoId: item.producto,
+          nombre: item.nombre,
+          cantidad: item.cantidad,
+          precio: item.precioUnitario,
+          proveedor: item.proveedor
+        })))
+      }
+    });
+    
+    console.log('\nCreando orden con items:', itemsValidados.length);
+    
+    // Crear orden con items validados
+    const orden = await Orden.create({
+      numeroOrden: `ORD-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+      usuario: req.user ? new mongoose.Types.ObjectId(req.user._id) : null,
+      items: itemsValidados, // Items ya validados con ObjectIds correctos
       subtotal,
       impuestos,
       envio,
@@ -532,9 +593,24 @@ export const crearPaymentIntent = async (req, res) => {
       estadoEnvio: 'pendiente'
     });
     
+    console.log('Orden creada exitosamente:');
+    console.log('  ID:', orden._id);
+    console.log('  Número:', orden.numeroOrden);
+    console.log('  Items guardados:', orden.items.length);
+    
+    // Verificar que se guardó correctamente
+    orden.items.forEach((item, index) => {
+      console.log(`  Item guardado ${index + 1}:`);
+      console.log(`    Producto: ${item.producto}`);
+      console.log(`    Proveedor: ${item.proveedor} (${typeof item.proveedor})`);
+      console.log(`    Es ObjectId: ${mongoose.Types.ObjectId.isValid(item.proveedor)}`);
+    });
+    
     // Actualizar estado del carrito
     carrito.estado = 'procesando';
     await carrito.save();
+    
+    console.log('=== FIN DEBUG CREACIÓN ===\n');
     
     res.json({
       clientSecret: paymentIntent.client_secret,
@@ -547,9 +623,14 @@ export const crearPaymentIntent = async (req, res) => {
         total
       }
     });
+    
   } catch (error) {
     console.error('Error al crear payment intent:', error);
-    res.status(500).json({ message: error.message });
+    console.error('Stack:', error.stack);
+    res.status(500).json({ 
+      message: error.message,
+      details: error.name === 'ValidationError' ? error.errors : undefined
+    });
   }
 };
 

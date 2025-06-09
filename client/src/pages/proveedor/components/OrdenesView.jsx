@@ -15,6 +15,9 @@ import {
   Chip,
   CircularProgress,
   Alert,
+  Button,
+  Menu,
+  MenuItem,
 } from '@mui/material';
 import { Close as CloseIcon } from '@mui/icons-material';
 import { format } from 'date-fns';
@@ -24,25 +27,27 @@ const OrdenesView = ({ open, onClose }) => {
   const [ordenes, setOrdenes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [selectedOrden, setSelectedOrden] = useState(null);
+
+  const fetchOrdenes = async () => {
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ordenes/proveedor`, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+      if (!response.ok) throw new Error('Error al cargar las órdenes');
+      const data = await response.json();
+      setOrdenes(Array.isArray(data.data) ? data.data : []);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchOrdenes = async () => {
-      try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ordenes/proveedor`, {
-          headers: {
-            'Authorization': `Bearer ${localStorage.getItem('token')}`
-          }
-        });
-        if (!response.ok) throw new Error('Error al cargar las órdenes');
-        const data = await response.json();
-        setOrdenes(data);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     if (open) {
       fetchOrdenes();
     }
@@ -54,9 +59,40 @@ const OrdenesView = ({ open, onClose }) => {
       procesando: 'info',
       completado: 'success',
       fallido: 'error',
-      reembolsado: 'default'
+      reembolsado: 'default',
+      enviado: 'success'
     };
     return colores[estado] || 'default';
+  };
+
+  const handleMenuClick = (event, orden) => {
+    setAnchorEl(event.currentTarget);
+    setSelectedOrden(orden);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+    setSelectedOrden(null);
+  };
+
+  const handleCambiarEstadoEnvio = async (nuevoEstado) => {
+    if (!selectedOrden) return;
+    try {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/ordenes/${selectedOrden._id}/estado-envio`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({ nuevoEstado })
+      });
+      if (!response.ok) throw new Error('Error al actualizar el estado');
+      await fetchOrdenes();
+      handleMenuClose();
+    } catch (err) {
+      alert('No se pudo actualizar el estado de envío');
+      handleMenuClose();
+    }
   };
 
   if (loading) {
@@ -125,13 +161,35 @@ const OrdenesView = ({ open, onClose }) => {
                       label={orden.estadoEnvio}
                       color={getEstadoColor(orden.estadoEnvio)}
                       size="small"
+                      sx={{ mr: 1 }}
                     />
+                    {orden.estadoEnvio !== 'enviado' && (
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        onClick={(e) => handleMenuClick(e, orden)}
+                      >
+                        Cambiar estado
+                      </Button>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </TableContainer>
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          {selectedOrden && selectedOrden.estadoEnvio === 'pendiente' && (
+            <MenuItem onClick={() => handleCambiarEstadoEnvio('procesando')}>Procesando</MenuItem>
+          )}
+          {selectedOrden && selectedOrden.estadoEnvio === 'procesando' && (
+            <MenuItem onClick={() => handleCambiarEstadoEnvio('enviado')}>Enviado</MenuItem>
+          )}
+        </Menu>
       </DialogContent>
     </Dialog>
   );

@@ -7,7 +7,7 @@ import StripeCheckout from '../checkout/StripeCheckout';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 import { useNavigate } from 'react-router-dom';
-
+import OrderTracking from '../order/OrderTracking';
 
 // Inicializar Stripe (con tu clave pública de entorno)
 const stripePromise = loadStripe('pk_test_51RUpeqGbqqKeGkYdc0b9t7UGY6JZjAnVo7oEQO23HBJnLJmC7H8LxzIFfreHLjdWCHQuPyM3m2XsaNqN7lwKIoNQ00Y0ENiARD');
@@ -30,7 +30,11 @@ const CarritoMejorado = () => {
 
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [showDeliverySimulation, setShowDeliverySimulation] = useState(false);
+  const [showOrderTracking, setShowOrderTracking] = useState(false);
+  const [orderId, setOrderId] = useState(null);
   const [orderDetails, setOrderDetails] = useState(null);
+  const [fetchError, setFetchError] = useState(null);
+  const [isLoadingOrder, setIsLoadingOrder] = useState(false);
   const navigate = useNavigate();
 
   const handleCantidadChange = async (productoId, nuevaCantidad) => {
@@ -47,22 +51,12 @@ const CarritoMejorado = () => {
   };
 
   const handleSuccess = (orden) => {
-    const formattedOrder = {
-      _id: orden._id,
-      direccionEnvio: {
-        calle: orden.direccionEnvio?.calle || '',
-        ciudad: orden.direccionEnvio?.ciudad || '',
-        estado: orden.direccionEnvio?.estado || '',
-        codigoPostal: orden.direccionEnvio?.codigoPostal || '',
-      },
-      datosContacto: {
-        nombre: orden.datosContacto?.nombre || '',
-        email: orden.datosContacto?.email || '',
-        telefono: orden.datosContacto?.telefono || '',
-      }
-    };
-    // Redirige a la página de entrega y pasa la orden
-    navigate('/delivery', { state: { order: formattedOrder } });
+    setOrderId(orden._id);
+    setOrderDetails(orden);
+    setShowOrderTracking(true);
+    if (orden._id) {
+      localStorage.setItem('lastOrderId', orden._id);
+    }
   };
 
   const formatPrice = (price) => {
@@ -102,6 +96,107 @@ const CarritoMejorado = () => {
       ))}
     </div>
   );
+
+  const fetchOrder = async () => {
+    if (!orderId) return;
+    
+    setIsLoadingOrder(true);
+    setFetchError(null);
+    
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('No has iniciado sesión. Por favor, inicia sesión para ver el seguimiento de tu pedido.');
+      }
+
+      console.log('Fetching order with ID:', orderId);
+      
+      // Mejorar la URL - asegurarse de que sea correcta
+      const apiUrl = `/api/ordenes/${orderId}`;
+      console.log('API URL:', apiUrl);
+      
+      const response = await fetch(apiUrl, {
+        method: 'GET',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        }
+      });
+
+      console.log('Response status:', response.status);
+      console.log('Response headers:', response.headers);
+      
+      // Verificar si la respuesta es exitosa
+      if (!response.ok) {
+        // Intentar obtener el mensaje de error
+        let errorMessage;
+        const contentType = response.headers.get('content-type');
+        
+        if (contentType && contentType.includes('application/json')) {
+          const errorData = await response.json();
+          errorMessage = errorData.message || `Error HTTP ${response.status}`;
+        } else {
+          // Si no es JSON, obtener el texto completo
+          const errorText = await response.text();
+          errorMessage = `Error HTTP ${response.status}: ${errorText || 'Respuesta no válida del servidor'}`;
+        }
+        
+        throw new Error(errorMessage);
+      }
+
+      // Verificar que la respuesta sea JSON
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        console.error('Respuesta no JSON recibida:', responseText);
+        throw new Error('El servidor devolvió contenido no válido. Respuesta esperada: JSON');
+      }
+
+      const data = await response.json();
+      console.log('Order data received:', data);
+      
+      setOrderDetails(data);
+      setFetchError(null);
+      
+    } catch (err) {
+      console.error('Error fetching order:', err);
+      setFetchError(err.message);
+      
+      // Si el error es de autenticación, limpiar el token
+      if (err.message.includes('401') || err.message.includes('iniciado sesión')) {
+        localStorage.removeItem('token');
+      }
+    } finally {
+      setIsLoadingOrder(false);
+    }
+  };
+
+  // Efecto para cargar la orden cuando se muestra el tracking
+  useEffect(() => {
+    if (showOrderTracking && orderId && !orderDetails) {
+      fetchOrder();
+    }
+  }, [showOrderTracking, orderId, orderDetails]);
+
+  if (showOrderTracking) {
+    return (
+      <OrderTracking
+        orderId={orderId}
+        orderDetails={orderDetails}
+        onClose={() => {
+          setShowOrderTracking(false);
+          setIsCartOpen(false);
+          vaciarCarrito();
+          setOrderDetails(null);
+          setFetchError(null);
+        }}
+        error={fetchError}
+        isLoading={isLoadingOrder}
+        onRetry={fetchOrder}
+      />
+    );
+  }
 
   if (!isCartOpen && !isCheckoutOpen) {
     return (

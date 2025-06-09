@@ -43,6 +43,7 @@ app.use('/api/productos', productoRoutes);
 app.use('/api/carrito', carritoRoutes);
 app.use('/api/ordenes', ordenRoutes);
 
+
 // Manejo de errores global
 app.use((err, req, res, next) => {
   console.error(err.stack);

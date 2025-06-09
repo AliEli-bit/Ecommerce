@@ -6,6 +6,8 @@ import { Button } from "../components/ui/button";
 import CarritoMejorado from "../components/carrito/CarritoMejorado";
 import 'react-toastify/dist/ReactToastify.css';
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import OrderTracking from '../components/order/OrderTracking';
 
 const Products = () => {
   const {
@@ -31,6 +33,10 @@ const Products = () => {
     actualizarCantidad
   } = useCarritoAvanzado();
 
+  const navigate = useNavigate();
+  const [showTracking, setShowTracking] = useState(false);
+  const lastOrderId = typeof window !== 'undefined' ? localStorage.getItem('lastOrderId') : null;
+
   const handleAddToCart = async (product) => {
     await agregarConNotificacion(product, 1);
   };
@@ -43,8 +49,26 @@ const Products = () => {
           <h1 className="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
             Productos
           </h1>
+          {lastOrderId && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/historial-compras')}
+              className="flex items-center gap-2 border-gray-200 hover:bg-gray-50 transition-colors duration-300"
+            >
+              <History className="w-4 h-4 mr-1" />
+              Ver mis pedidos
+            </Button>
+          )}
         </div>
       </header>
+
+      {showTracking && lastOrderId && (
+        <OrderTracking
+          orderId={lastOrderId}
+          onClose={() => setShowTracking(false)}
+        />
+      )}
 
       {/* Filters */}
       <div className="bg-white/80 backdrop-blur-sm shadow-sm mt-16">

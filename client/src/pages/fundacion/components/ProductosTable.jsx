@@ -34,7 +34,8 @@ const ProductosTable = ({
   loading,
   error,
   onEdit,
-  onDelete
+  onDelete,
+  proveedores = []
 }) => {
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [selectedProducto, setSelectedProducto] = useState(null);
@@ -326,7 +327,14 @@ const ProductosTable = ({
                 <TableCell>{producto.unidad}</TableCell>
                 <TableCell>
                   <Typography variant="body2">
-                    {producto.proveedor?.nombre || 'Sin asignar'}
+                    {(() => {
+                      if (!producto.proveedor) return 'Sin asignar';
+                      if (typeof producto.proveedor === 'object' && producto.proveedor.nombre) {
+                        return producto.proveedor.nombre;
+                      }
+                      const found = proveedores.find(p => p._id === producto.proveedor);
+                      return found ? found.nombre : 'Sin asignar';
+                    })()}
                   </Typography>
                 </TableCell>
                 <TableCell>

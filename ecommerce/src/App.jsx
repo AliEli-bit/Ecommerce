@@ -5,6 +5,7 @@ import Register from "@/components/auth/Register";
 import Products from "@/pages/Products";
 import DeliveryPage from "@/pages/delivery";
 import DeliverySimulation from "@/pages/delivery/DeliverySimulation";
+import HistorialCompras from "@/pages/HistorialCompras";
 import { CarritoProvider } from "@/context/CarritoContext";
 // import CarritoMejorado from "@/components/carrito/CarritoMejorado"; // Eliminar importación
 
@@ -19,6 +20,7 @@ function App() {
           <Route path="/products" element={<Products />} />
           <Route path="/delivery" element={<DeliveryPage />} />
           <Route path="/delivery-simulation" element={<DeliverySimulation />} />
+          <Route path="/historial-compras" element={<HistorialCompras />} />
         </Routes>
       </Router>
     </CarritoProvider>

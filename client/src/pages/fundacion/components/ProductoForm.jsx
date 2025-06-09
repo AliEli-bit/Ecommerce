@@ -69,7 +69,7 @@ const ProductoForm = ({
           unidad: initialData.unidad || '',
           stock: initialData.stock ? initialData.stock.toString() : '',
           categoria: initialData.categoria || '',
-          proveedor: initialData.proveedor || '',
+          proveedor: initialData.proveedor?._id || initialData.proveedor || '',
           estado: initialData.estado || 'activo'
         });
         setShowDataForm(true);

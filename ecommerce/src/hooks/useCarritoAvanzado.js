@@ -53,8 +53,8 @@ export const useCarritoAvanzado = () => {
   const totales = {
     subtotal: carrito.total,
     impuestos: carrito.total * 0.16, // 16% de IVA
-    envio: carrito.total > 500 ? 0 : 50, // Envío gratis sobre $500
-    total: carrito.total + (carrito.total * 0.16) + (carrito.total > 500 ? 0 : 50)
+    envio: carrito.total > 500 ? 0 : 5, // Envío gratis sobre $500
+    total: carrito.total + (carrito.total * 0.16) + (carrito.total > 500 ? 0 : 5)
   };
 
   // Verificar si un producto está en el carrito
