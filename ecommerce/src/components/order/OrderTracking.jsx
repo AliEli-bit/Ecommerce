@@ -1,6 +1,7 @@
 // components/order/OrderTracking.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import { X, Package, Clock, Truck, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import DeliverySimulation from '../map/DeliverySimulation';
 
 const OrderTracking = ({ 
   orderId, 
@@ -349,6 +350,12 @@ const OrderTracking = ({
                       }`}>
                         {step.description}
                       </p>
+                      {/* Mostrar el tracking solo cuando el estado es 'enviado' y es el paso activo */}
+                      {step.status === 'enviado' && isActive && (
+                        <div className="mt-4">
+                          <DeliverySimulation />
+                        </div>
+                      )}
                     </div>
                   </div>
                 );

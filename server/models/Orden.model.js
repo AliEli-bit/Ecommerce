@@ -65,7 +65,26 @@ const ordenSchema = new mongoose.Schema({
     ciudad: String,
     estado: String,
     codigoPostal: String,
-    pais: { type: String, default: 'MX' }
+    pais: { type: String, default: 'MX' },
+    coordenadas: {
+      type: {
+        type: String,
+        enum: ['Point'],
+        default: 'Point'
+      },
+      coordinates: {
+        type: [Number],
+        required: true,
+        validate: {
+          validator: function(v) {
+            return v.length === 2 && 
+                   v[0] >= -90 && v[0] <= 90 && 
+                   v[1] >= -180 && v[1] <= 180;
+          },
+          message: 'Las coordenadas deben ser [latitud, longitud] válidas'
+        }
+      }
+    }
   },
   datosContacto: {
     nombre: String,

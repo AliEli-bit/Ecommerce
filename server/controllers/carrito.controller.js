@@ -586,7 +586,16 @@ export const crearPaymentIntent = async (req, res) => {
       impuestos,
       envio,
       total,
-      direccionEnvio,
+      direccionEnvio: {
+        ...direccionEnvio,
+        coordenadas: {
+          type: 'Point',
+          coordinates: [
+            parseFloat(direccionEnvio.latitud || -17.7863),
+            parseFloat(direccionEnvio.longitud || -63.1812)
+          ]
+        }
+      },
       datosContacto,
       stripePaymentIntentId: paymentIntent.id,
       estadoPago: 'pendiente',

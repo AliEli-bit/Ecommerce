@@ -9,6 +9,7 @@ export const crearFundacion = async (req, res) => {
       nombre,
       nit,
       direccion,
+      location,
       telefono,
       email,
       representante,
@@ -60,7 +61,7 @@ export const crearFundacion = async (req, res) => {
     const fundacion = await Fundacion.create({
       nombre,
       nit,
-      direccion,
+      direccion, 
       telefono,
       email,
       representante,

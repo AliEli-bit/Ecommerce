@@ -38,6 +38,8 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
     ciudad: '',
     estado: '',
     codigoPostal: '',
+    latitud: '-17.7863',
+    longitud: '-63.1812'
   });
 
   const [loading, setLoading] = useState(false);
@@ -78,6 +80,8 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
           ciudad: datosEnvio.ciudad,
           estado: datosEnvio.estado,
           codigoPostal: datosEnvio.codigoPostal,
+          latitud: datosEnvio.latitud,
+          longitud: datosEnvio.longitud
         },
         datosContacto: {
           nombre: datosEnvio.nombre,

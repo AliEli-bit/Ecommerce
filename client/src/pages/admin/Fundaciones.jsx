@@ -36,18 +36,65 @@ L.Icon.Default.mergeOptions({
 });
 
 const LocationMarker = ({ position, setPosition }) => {
+  const defaultPosition = [-17.7833, -63.1821]; // Santa Cruz, Bolivia
+
   useMapEvents({
     click(e) {
       setPosition([e.latlng.lat, e.latlng.lng]);
     },
   });
 
-  return position ? <Marker position={position} draggable={true} eventHandlers={{
-    dragend: (e) => {
-      setPosition([e.target.getLatLng().lat, e.target.getLatLng().lng]);
-    },
-  }} /> : null;
+  return position ? (
+    <Marker 
+      position={position} 
+      draggable={true} 
+      eventHandlers={{
+        dragend: (e) => {
+          setPosition([e.target.getLatLng().lat, e.target.getLatLng().lng]);
+        },
+      }} 
+    />
+  ) : (
+    <Marker 
+      position={defaultPosition} 
+      draggable={true} 
+      eventHandlers={{
+        dragend: (e) => {
+          setPosition([e.target.getLatLng().lat, e.target.getLatLng().lng]);
+        },
+      }} 
+    />
+  );
 };
+
+// Error Boundary Component
+class ErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
+  }
+
+  componentDidCatch(error, errorInfo) {
+    console.error('Error en el componente:', error, errorInfo);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <h2 className="text-lg font-semibold text-red-800">Algo salió mal</h2>
+          <p className="text-red-600">Por favor, intenta recargar la página</p>
+        </div>
+      );
+    }
+
+    return this.props.children;
+  }
+}
 
 const Fundaciones = () => {
   const navigate = useNavigate();
@@ -71,6 +118,24 @@ const Fundaciones = () => {
     height: '300px',
     borderRadius: '8px',
     marginTop: '8px'
+  };
+
+  const defaultCenter = [-17.7833, -63.1821]; // Santa Cruz, Bolivia
+
+  // Función para validar coordenadas
+  const isValidCoordinates = (coords) => {
+    return Array.isArray(coords) && 
+           coords.length === 2 && 
+           typeof coords[0] === 'number' && 
+           typeof coords[1] === 'number';
+  };
+
+  // Obtener coordenadas válidas
+  const getValidCoordinates = () => {
+    if (formData.location && isValidCoordinates(formData.location)) {
+      return formData.location;
+    }
+    return defaultCenter;
   };
 
   if (loading) {
@@ -270,16 +335,17 @@ const Fundaciones = () => {
               </Typography>
               <div style={mapContainerStyle}>
                 <MapContainer
-                  center={formData.location || [-17.7833, -63.1821]}
+                  center={getValidCoordinates()}
                   zoom={13}
                   style={{ height: '100%', width: '100%' }}
+                  key={`map-${getValidCoordinates().join(',')}`}
                 >
                   <TileLayer
                     attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                   />
                   <LocationMarker 
-                    position={formData.location || [-17.7833, -63.1821]} 
+                    position={getValidCoordinates()} 
                     setPosition={(newPosition) => handleInputChange({ target: { name: 'location', value: newPosition } })}
                   />
                 </MapContainer>
@@ -291,7 +357,9 @@ const Fundaciones = () => {
               )}
               <Box className="mt-2">
                 <Typography variant="body2">
-                  Coordenadas seleccionadas: {formData.location ? `${formData.location[0].toFixed(6)}, ${formData.location[1].toFixed(6)}` : 'No seleccionada'}
+                  Coordenadas seleccionadas: {isValidCoordinates(formData.location) 
+                    ? `${formData.location[0].toFixed(6)}, ${formData.location[1].toFixed(6)}` 
+                    : 'No seleccionada'}
                 </Typography>
               </Box>
             </div>
@@ -433,4 +501,11 @@ const Fundaciones = () => {
   );
 };
 
-export default Fundaciones; 
+// Wrap the entire component with ErrorBoundary
+export default function FundacionesWithErrorBoundary() {
+  return (
+    <ErrorBoundary>
+      <Fundaciones />
+    </ErrorBoundary>
+  );
+} 
