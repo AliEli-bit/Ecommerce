@@ -44,6 +44,10 @@ const proveedorSchema = new mongoose.Schema({
     ref: 'Fundacion',
     required: true
   },
+  imagenes: [{
+    url: String,
+    public_id: String
+  }],
   estado: {
     type: String,
     enum: ['pendiente', 'aprobado', 'rechazado'],

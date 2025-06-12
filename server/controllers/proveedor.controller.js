@@ -1,6 +1,7 @@
 import Proveedor from '../models/Proveedor.model.js';
 import Fundacion from '../models/Fundacion.model.js';
 import Usuario from '../models/Usuario.model.js';
+import { cloudinary } from '../config/cloudinary.js';
 
 // Crear un nuevo proveedor
 export const crearProveedor = async (req, res) => {
@@ -248,6 +249,56 @@ export const eliminarProveedor = async (req, res) => {
     }
     res.json({ message: 'Proveedor eliminado correctamente' });
   } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Subir imagen de proveedor
+export const subirImagenProveedor = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: 'No se ha subido ninguna imagen' });
+    }
+
+    const proveedor = await Proveedor.findById(req.params.id);
+    if (!proveedor) {
+      return res.status(404).json({ message: 'Proveedor no encontrado' });
+    }
+
+    // Agregar la nueva imagen al array de imágenes
+    proveedor.imagenes.push({
+      url: req.file.path,
+      public_id: req.file.filename
+    });
+
+    await proveedor.save();
+    res.json(proveedor);
+  } catch (error) {
+    console.error('Error al subir imagen:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Eliminar imagen de proveedor
+export const eliminarImagenProveedor = async (req, res) => {
+  try {
+    const { proveedorId, publicId } = req.params;
+    
+    const proveedor = await Proveedor.findById(proveedorId);
+    if (!proveedor) {
+      return res.status(404).json({ message: 'Proveedor no encontrado' });
+    }
+
+    // Eliminar la imagen de Cloudinary
+    await cloudinary.uploader.destroy(publicId);
+
+    // Eliminar la imagen del array de imágenes del proveedor
+    proveedor.imagenes = proveedor.imagenes.filter(img => img.public_id !== publicId);
+    await proveedor.save();
+
+    res.json({ message: 'Imagen eliminada correctamente' });
+  } catch (error) {
+    console.error('Error al eliminar imagen:', error);
     res.status(500).json({ message: error.message });
   }
 };

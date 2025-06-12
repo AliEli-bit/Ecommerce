@@ -6,7 +6,7 @@ import { upload } from '../config/cloudinary.js';
 // Crear un nuevo producto
 export const crearProducto = async (req, res) => {
   try {
-    const { nombre, descripcion, precio, unidad, stock, categoria, proveedor } = req.body;
+    const { nombre, descripcion, precio, unidad, stock, categoria, proveedor, fundaciones_asociadas } = req.body;
     let imagenes = [];
     if (req.file) {
       imagenes.push({
@@ -75,6 +75,7 @@ export const crearProducto = async (req, res) => {
       categoria,
       proveedor: proveedorId,
       fundacion,
+      fundaciones_asociadas: fundaciones_asociadas || [],
       imagenes
     });
 
@@ -178,8 +179,13 @@ export const actualizarProducto = async (req, res) => {
       }
     }
 
+    // Actualizar campos
     Object.keys(req.body).forEach(key => {
-      producto[key] = req.body[key];
+      if (key === 'fundaciones_asociadas') {
+        producto[key] = req.body[key] || [];
+      } else {
+        producto[key] = req.body[key];
+      }
     });
 
     const productoActualizado = await producto.save();
@@ -223,25 +229,37 @@ export const eliminarProducto = async (req, res) => {
   }
 };
 
-//Obtener todos los productos 
-
+//Obtener todos los productos // Actualización para la función obtenerTodosProductosdef
 export const obtenerTodosProductosdef = async (req, res) => {
   try {
     const { categoria, proveedor, estado } = req.query;
     const query = {};
 
+    // Filtro por categoría
     if (categoria) query.categoria = categoria;
-    if (proveedor && mongoose.Types.ObjectId.isValid(proveedor)) {
-      query.proveedor = proveedor;
+    
+    // Filtro por proveedor - verificar si es un ObjectId válido
+    if (proveedor) {
+      if (mongoose.Types.ObjectId.isValid(proveedor)) {
+        query.proveedor = proveedor;
+      } else {
+        console.log('ID de proveedor no válido:', proveedor);
+        return res.status(400).json({ message: 'ID de proveedor no válido' });
+      }
     }
+    
+    // Filtro por estado
     if (estado) query.estado = estado;
 
     console.log('Consulta (todos):', query);
 
     const productos = await Producto.find(query)
-      .populate('proveedor', 'nombre email')
+      .populate('proveedor', 'nombre email tipoServicio')
+      .populate('fundacion', 'nombre') // Añadir fundación también
       .sort({ createdAt: -1 });
 
+    console.log(`Productos encontrados: ${productos.length}`);
+    
     res.set('Cache-Control', 'no-store');
     return res.json(productos);
   } catch (error) {
@@ -249,6 +267,7 @@ export const obtenerTodosProductosdef = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
 
 // Obtener productos por proveedor
 export const obtenerProductosProveedor = async (req, res) => {

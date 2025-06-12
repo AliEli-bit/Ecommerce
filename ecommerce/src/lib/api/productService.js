@@ -14,19 +14,56 @@ const productService = {
   getAllProducts: async (filters = {}) => {
     try {
       const token = localStorage.getItem('token');
+      
+      // Construir parámetros de consulta
+      const params = {};
+      if (filters.category) params.categoria = filters.category;
+      if (filters.proveedor) params.proveedor = filters.proveedor;
+      if (filters.status) params.estado = filters.status;
+
+      console.log('Enviando filtros:', params);
+
       const response = await axios.get(`${API_URL}/productos/todos`, {
         headers: {
           Authorization: `Bearer ${token}`
         },
-        params: {
-          categoria: filters.category || undefined,
-          proveedor: filters.provider || undefined,
-          estado: filters.status || undefined
-        }
+        params
       });
+      
       return response.data;
     } catch (error) {
       console.error('Error al obtener productos:', error);
+      throw error;
+    }
+  },
+
+  /**
+   * Obtiene productos específicos de un proveedor
+   * @param {string} proveedorId - ID del proveedor
+   * @param {Object} filters - Filtros adicionales (categoria, estado)
+   * @returns {Promise<Array>} Lista de productos del proveedor
+   */
+  getProductsByProvider: async (proveedorId, filters = {}) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      const params = {
+        proveedor: proveedorId,
+        ...filters
+      };
+
+      console.log('Obteniendo productos del proveedor:', proveedorId, 'con filtros:', params);
+
+      const response = await axios.get(`${API_URL}/productos/todos`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        params
+      });
+      
+      return response.data;
+    } catch (error) {
+      console.error(`Error al obtener productos del proveedor ${proveedorId}:`, error);
       throw error;
     }
   },
@@ -115,4 +152,4 @@ const productService = {
   }
 };
 
-export default productService; 
+export default productService;

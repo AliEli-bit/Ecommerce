@@ -43,7 +43,7 @@ export default function Login() {
       }
      
       // Redirigir a la página de productos después del login exitoso
-      navigate("/products");
+      navigate("/proveedores");
     } catch (err) {
       console.error('Error de autenticación:', err);
       

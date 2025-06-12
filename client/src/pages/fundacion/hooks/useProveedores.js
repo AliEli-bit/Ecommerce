@@ -71,6 +71,35 @@ export const useProveedores = () => {
     }
   };
 
+  const handleUploadImagen = async (proveedorId, formData) => {
+    try {
+      console.log('=== UPLOADING PROVEEDOR IMAGEN ===');
+      console.log('Proveedor ID:', proveedorId);
+      
+      const response = await axios.post(`/proveedores/${proveedorId}/imagen`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+
+      console.log('Upload imagen response:', response.data);
+      
+      setProveedores(prev => prev.map(p => 
+        p._id === proveedorId ? response.data : p
+      ));
+      
+      return response.data;
+    } catch (err) {
+      console.error('Error uploading imagen:', err.response || err);
+      if (err.response) {
+        setError(err.response.data?.message || 'Error al subir la imagen');
+      } else {
+        setError('Error al subir la imagen');
+      }
+      throw err;
+    }
+  };
+
   const handleEditProveedor = async (id, proveedorData) => {
     try {
       console.log('Editing proveedor:', id, proveedorData);
@@ -119,6 +148,7 @@ export const useProveedores = () => {
     loading,
     error,
     handleAddProveedor,
+    handleUploadImagen,
     handleEditProveedor,
     handleDeleteProveedor,
     refreshProveedores: fetchProveedores

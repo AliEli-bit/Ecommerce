@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import productService from "../lib/api/productService"
 
-export const useProducts = () => {
+export const useProducts = (proveedorId = null) => {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -30,7 +30,7 @@ export const useProducts = () => {
 
   useEffect(() => {
     fetchProducts()
-  }, [])
+  }, [proveedorId]) // Añadir proveedorId como dependencia
 
   const filteredProducts = products.filter(product => {
     const matchesCategory = selectedCategory === 'todos' || product.category === selectedCategory
@@ -51,7 +51,10 @@ export const useProducts = () => {
         matchesPrice = true
     }
 
-    return matchesCategory && matchesPrice
+    // Si hay un proveedorId, filtrar también por proveedor
+    const matchesProvider = !proveedorId || product.providerId === proveedorId
+
+    return matchesCategory && matchesPrice && matchesProvider
   })
 
   const fetchProducts = async () => {
@@ -67,7 +70,15 @@ export const useProducts = () => {
       }
 
       console.log("Obteniendo productos de la API...")
-      const data = await productService.getAllProducts()
+      
+      // Crear filtros para el servicio
+      const filters = {}
+      if (proveedorId) {
+        filters.provider = proveedorId
+        console.log("Filtrando por proveedor:", proveedorId)
+      }
+
+      const data = await productService.getAllProducts(filters)
       console.log("Datos recibidos:", data)
 
       if (!data || data.length === 0) {
@@ -87,6 +98,8 @@ export const useProducts = () => {
         tags: [product.categoria],
         stock: product.stock,
         unit: product.unidad,
+        providerId: product.proveedor?._id || product.proveedor, // Guardar ID del proveedor
+        providerName: product.proveedor?.nombre || 'Proveedor no especificado', // Nombre del proveedor
         foundations: product.fundaciones ? product.fundaciones.map(foundation => ({
           id: foundation._id,
           name: foundation.nombre
@@ -194,7 +207,8 @@ export const useProducts = () => {
     handleAddToCart,
     handleToggleFavorite,
     handleRemoveFromCart,
-    handleUpdateQuantity, // ✅ Nueva función exportada
-    clearFilters
+    handleUpdateQuantity,
+    clearFilters,
+    proveedorId // Exponer el proveedorId actual
   }
 }

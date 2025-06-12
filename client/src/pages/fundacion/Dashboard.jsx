@@ -41,7 +41,8 @@ const Dashboard = () => {
     error: errorProveedores,
     handleAddProveedor,
     handleEditProveedor,
-    handleDeleteProveedor
+    handleDeleteProveedor,
+    handleUploadImagen
   } = useProveedores();
 
   const {
@@ -49,7 +50,7 @@ const Dashboard = () => {
     loading: loadingProductos,
     error: errorProductos,
     handleAddProducto,
-    handleUploadImagen, // Nueva función separada
+    handleUploadImagen: handleUploadImagenProductos, // Nueva función separada
     handleEditProducto,
     handleDeleteProducto
   } = useProductos();
@@ -107,7 +108,7 @@ const Dashboard = () => {
       console.log('Producto ID:', productoId);
       console.log('Imagen file:', imagenFile);
       
-      const productoActualizado = await handleUploadImagen(productoId, imagenFile);
+      const productoActualizado = await handleUploadImagenProductos(productoId, imagenFile);
       console.log('Imagen subida exitosamente:', productoActualizado);
       
       return productoActualizado;
@@ -298,6 +299,7 @@ const Dashboard = () => {
         onClose={handleCloseProveedorForm}
         onSubmit={handleSubmitProveedor}
         initialData={selectedProveedor}
+        onUploadImagen={handleUploadImagen}
       />
     </div>
   );
