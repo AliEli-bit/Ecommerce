@@ -82,7 +82,18 @@ export const createCheckout = async (req, res) => {
   try {
     const checkoutDto = req.body;
 
-    // Validar stock para cada producto
+    // ✅ Validar o añadir coordenadas manualmente si no vienen
+    if (
+      !Array.isArray(checkoutDto.coordinates) ||
+      checkoutDto.coordinates.length !== 2 ||
+      typeof checkoutDto.coordinates[0] !== 'number' ||
+      typeof checkoutDto.coordinates[1] !== 'number'
+    ) {
+      // Puedes lanzar error o usar coordenadas por defecto
+      checkoutDto.coordinates = [-17.7833, -63.1821]; // Ejemplo: Santa Cruz
+    }
+
+    // 🔁 Validar stock
     for (const item of checkoutDto.orderItems) {
       const product = await Product.findById(item.productId);
       if (!product) {
@@ -90,12 +101,12 @@ export const createCheckout = async (req, res) => {
       }
       if (product.stock < item.productQuantity) {
         return res.status(400).json({
-          message: `Stock insuficiente para el producto "${item.productName}". Disponible: ${product.stock}, solicitado: ${item.productQuantity}`
+          message: `Stock insuficiente para "${item.productName}". Disponible: ${product.stock}, solicitado: ${item.productQuantity}`
         });
       }
     }
 
-    // Restar stock de todos los productos
+    // 🧾 Restar stock
     for (const item of checkoutDto.orderItems) {
       await Product.findByIdAndUpdate(
         item.productId,
@@ -103,30 +114,34 @@ export const createCheckout = async (req, res) => {
       );
     }
 
-    // Mapear DTO a orden
+    // 🛠️ Mapear DTO a datos de Orden
     const ordenData = checkoutDtoToOrden(checkoutDto);
 
-    // Calcular subtotal
+    // 🧮 Calcular subtotal
     const subtotal = ordenData.items.reduce((sum, item) => sum + item.subtotal, 0);
 
-    // Generar número de orden único aquí
+    // 🧾 Generar número de orden único
     const count = await Orden.countDocuments();
     const numeroOrdenGenerado = `ORD-${Date.now()}-${count + 1}`;
 
-    // Completar datos para modelo Orden
+    // 🧩 Completar datos de orden con direcciones y contacto
     const ordenCompleta = {
       ...ordenData,
       subtotal,
       impuestos: 0,
       estadoPago: 'pendiente',
       fechaPago: null,
-      numeroOrden: numeroOrdenGenerado,  // asignamos el número generado aquí
+      numeroOrden: numeroOrdenGenerado,
       direccionEnvio: {
         ...ordenData.direccionEnvio,
         calle: checkoutDto.receiverStreet || '',
         ciudad: checkoutDto.receiverCity || '',
         estado: checkoutDto.receiverState || '',
-        codigoPostal: checkoutDto.receiverZip || ''
+        codigoPostal: checkoutDto.receiverZip || '',
+        coordenadas: {
+          type: 'Point',
+          coordinates: checkoutDto.coordinates // ✅ Incluidas correctamente aquí
+        }
       },
       datosContacto: {
         nombre: ordenData.datosContacto.nombre,
@@ -135,18 +150,17 @@ export const createCheckout = async (req, res) => {
       }
     };
 
-    // Crear y guardar la orden
+    // 💾 Guardar en la base de datos
     const newOrder = new Orden(ordenCompleta);
     const savedOrder = await newOrder.save();
 
     res.status(201).json(savedOrder);
 
-  } catch (error) {
+  }catch(error) {
     console.error('Error al crear el checkout:', error);
-    res.status(500).json({ message: 'Error al crear el checkout' });
+    res.status(500).json({ message: 'Error al crear el checkout', error });
   }
 };
-
  /////////////////////////////////////////////////
 export const getAllCheckouts = async (req, res) => {
   try {

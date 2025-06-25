@@ -1,3 +1,4 @@
+import mongoose from 'mongoose';
 import Producto from '../models/Producto.model.js';
 import Proveedor from '../models/Proveedor.model.js';
 import { cloudinary } from '../config/cloudinary.js';
