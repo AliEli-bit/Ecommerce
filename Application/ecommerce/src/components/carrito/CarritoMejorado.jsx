@@ -40,9 +40,9 @@ const CarritoMejorado = () => {
   const handleCantidadChange = async (productoId, nuevaCantidad) => {
     if (nuevaCantidad < 1) {
       const item = items.find(item => 
-        (item.producto._id || item.producto.id) === productoId
+        item.producto && (item.producto._id || item.producto.id) === productoId
       );
-      if (item) {
+      if (item && item.producto) {
         await eliminarConNotificacion(productoId, item.producto.nombre);
       }
     } else {
@@ -60,9 +60,9 @@ const CarritoMejorado = () => {
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-MX', {
+    return new Intl.NumberFormat('es-BO', {
       style: 'currency',
-      currency: 'MXN'
+      currency: 'BOB'
     }).format(price);
   };
 
@@ -273,74 +273,81 @@ const CarritoMejorado = () => {
               </div>
             ) : (
               <div className="p-6 space-y-4">
-                {items.map((item) => (
-                  <div
-                    key={item.producto._id || item.producto.id}
-                    className="flex items-center space-x-4 p-4 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl hover:shadow-md transition-all duration-300"
-                  >
-                    <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                      {item.producto.imagenes && item.producto.imagenes.length > 0 ? (
-                        <img
-                          src={item.producto.imagenes[0].url}
-                          alt={item.producto.nombre}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <Package className="w-6 h-6 text-gray-400" />
-                        </div>
-                      )}
-                    </div>
+                {items.map((item) => {
+                  // Skip rendering if item.producto is null or undefined
+                  if (!item.producto) {
+                    return null;
+                  }
+                  
+                  return (
+                    <div
+                      key={item.producto._id || item.producto.id}
+                      className="flex items-center space-x-4 p-4 bg-white/80 backdrop-blur-sm border border-gray-200 rounded-xl hover:shadow-md transition-all duration-300"
+                    >
+                      <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        {item.producto.imagenes && item.producto.imagenes.length > 0 ? (
+                          <img
+                            src={item.producto.imagenes[0].url}
+                            alt={item.producto.nombre}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center">
+                            <Package className="w-6 h-6 text-gray-400" />
+                          </div>
+                        )}
+                      </div>
 
-                    <div className="flex-1 min-w-0">
-                      <h3 className="font-medium text-gray-900 truncate">
-                        {item.producto.nombre}
-                      </h3>
-                      <p className="text-sm text-gray-600">
-                        {formatPrice(item.precioUnitario)} por {item.producto.unidad}
-                      </p>
-                      <p className="text-sm font-medium text-orange-600">
-                        Subtotal: {formatPrice(item.subtotal)}
-                      </p>
-                    </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-medium text-gray-900 truncate">
+                          {item.producto.nombre}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                          {formatPrice(item.precioUnitario)} por {item.producto.unidad}
+                        </p>
+                        <p className="text-sm font-medium text-orange-600">
+                          Subtotal: {formatPrice(item.subtotal)}
+                        </p>
+                      </div>
 
-                    <div className="flex items-center space-x-2">
-                      <button
-                        onClick={() => handleCantidadChange(
-                          item.producto._id || item.producto.id,
-                          item.cantidad - 1
-                        )}
-                        className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-300"
-                      >
-                        <Minus className="w-4 h-4 text-gray-600" />
-                      </button>
-                      
-                      <span className="w-12 text-center font-medium text-gray-700">
-                        {item.cantidad}
-                      </span>
-                      
-                      <button
-                        onClick={() => handleCantidadChange(
-                          item.producto._id || item.producto.id,
-                          item.cantidad + 1
-                        )}
-                        className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-300"
-                      >
-                        <Plus className="w-4 h-4 text-gray-600" />
-                      </button>
-                      
-                      <button
-                        onClick={() => eliminarConNotificacion(
-                          item.producto._id || item.producto.id,
-                          item.producto.nombre
-                        )}
-                        className="p-1 hover:bg-red-50 text-red-500 rounded-lg transition-colors duration-300 ml-2"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center space-x-2">
+                        <button
+                          onClick={() => handleCantidadChange(
+                            item.producto._id || item.producto.id,
+                            item.cantidad - 1
+                          )}
+                          className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-300"
+                        >
+                          <Minus className="w-4 h-4 text-gray-600" />
+                        </button>
+                        
+                        <span className="w-12 text-center font-medium text-gray-700">
+                          {item.cantidad}
+                        </span>
+                        
+                        <button
+                          onClick={() => handleCantidadChange(
+                            item.producto._id || item.producto.id,
+                            item.cantidad + 1
+                          )}
+                          className="p-1 hover:bg-gray-100 rounded-lg transition-colors duration-300"
+                        >
+                          <Plus className="w-4 h-4 text-gray-600" />
+                        </button>
+                        
+                        <button
+                          onClick={() => eliminarConNotificacion(
+                            item.producto._id || item.producto.id,
+                            item.producto.nombre
+                          )}
+                          className="p-1 hover:bg-red-50 text-red-500 rounded-lg transition-colors duration-300 ml-2"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )
           )}

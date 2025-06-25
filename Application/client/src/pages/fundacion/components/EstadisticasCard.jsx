@@ -172,7 +172,7 @@ const EstadisticasCard = ({ filtros }) => {
                     </Typography>
                   </Box>
                   <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
-                    ${datos.valor.toFixed(2)}
+                    Bs {datos.valor.toFixed(2)}
                   </Typography>
                 </Box>
               </Grid>
@@ -221,7 +221,7 @@ const EstadisticasCard = ({ filtros }) => {
                     }
                   />
                   <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'primary.main' }}>
-                    ${datos.valor.toFixed(2)}
+                    Bs {datos.valor.toFixed(2)}
                   </Typography>
                 </ListItem>
               ))}
@@ -267,7 +267,7 @@ const EstadisticasCard = ({ filtros }) => {
                     }
                   />
                   <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-                    ${datos.valor.toFixed(2)}
+                    Bs {datos.valor.toFixed(2)}
                   </Typography>
                 </ListItem>
               ))}
@@ -307,7 +307,7 @@ const EstadisticasCard = ({ filtros }) => {
                     sx={{ bgcolor: 'info.100', color: 'info.800' }}
                   />
                   <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-                    ${dia.valor.toFixed(2)}
+                    Bs {dia.valor.toFixed(2)}
                   </Typography>
                 </Box>
               </Box>

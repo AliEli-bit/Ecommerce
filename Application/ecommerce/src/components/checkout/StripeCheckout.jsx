@@ -201,15 +201,15 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
           <div className="bg-gray-50/80 backdrop-blur-sm p-4 rounded-xl space-y-2">
             <div className="flex justify-between text-sm text-gray-600">
               <span>Subtotal:</span>
-              <span>${desglose.subtotal.toFixed(2)}</span>
+              <span>Bs {desglose.subtotal.toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm text-gray-600">
               <span>Envío:</span>
-              <span>{desglose.envio === 0 ? 'Gratis' : `$${desglose.envio.toFixed(2)}`}</span>
+              <span>{desglose.envio === 0 ? 'Gratis' : `Bs ${desglose.envio.toFixed(2)}`}</span>
             </div>
             <div className="flex justify-between font-bold text-lg pt-2 border-t border-gray-200">
               <span className="text-gray-900">Total:</span>
-              <span className="text-gray-900">${total.toFixed(2)}</span>
+              <span className="text-gray-900">Bs {total.toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -229,7 +229,7 @@ const CheckoutForm = ({ onSuccess, total, desglose, onClose }) => {
           className="w-full bg-gradient-to-r from-orange-600 to-amber-600 hover:from-orange-700 hover:to-amber-700 text-white py-3 rounded-xl transition-all duration-300 font-medium flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {loading && <Loader2 className="animate-spin w-4 h-4 mr-2" />}
-          {step === 'info' ? 'Continuar al Pago' : `Pagar $${total.toFixed(2)}`}
+          {step === 'info' ? 'Continuar al Pago' : `Pagar Bs ${total.toFixed(2)}`}
         </button>
 
         {step === 'payment' && (
@@ -255,7 +255,7 @@ export default function StripeCheckout({ isOpen, onClose, onSuccess }) {
   const desglose = {
     subtotal: total,
     impuestos: total * 0.16,
-    envio: total > 500 ? 0 : 50,
+    envio: total > 500 ? 0 : 50, // Envío gratis sobre Bs 500
     total: total + total * 0.16 + (total > 500 ? 0 : 50),
   };
 

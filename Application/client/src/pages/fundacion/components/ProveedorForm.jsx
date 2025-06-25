@@ -90,6 +90,9 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData, onUploadImagen })
   const [proveedorCreado, setProveedorCreado] = useState(null);
   const [showDataForm, setShowDataForm] = useState(true);
   const [showImageSection, setShowImageSection] = useState(true);
+  const [nitsExistentes, setNitsExistentes] = useState([]);
+  const [emailsExistentes, setEmailsExistentes] = useState([]);
+  const [telefonosExistentes, setTelefonosExistentes] = useState([]);
 
   const isEditing = initialData && initialData._id;
 
@@ -120,19 +123,43 @@ const ProveedorForm = ({ open, onClose, onSubmit, initialData, onUploadImagen })
       }
       setErrors({});
       setSubmitError('');
+      // Obtener NITs, emails y teléfonos existentes solo al crear (no editar)
+      if (!initialData) {
+        axios.get('/api/proveedores')
+          .then(res => {
+            setNitsExistentes(res.data.map(p => p.nit));
+            setEmailsExistentes(res.data.map(p => p.email));
+            setTelefonosExistentes(res.data.map(p => p.telefono));
+          })
+          .catch(() => {
+            setNitsExistentes([]);
+            setEmailsExistentes([]);
+            setTelefonosExistentes([]);
+          });
+      }
     }
   }, [initialData, open, user]);
 
   const validateForm = () => {
     const newErrors = {};
     if (!formData.nombre?.trim()) newErrors.nombre = 'El nombre es requerido';
-    if (!formData.nit?.trim()) newErrors.nit = 'El NIT es requerido';
+    if (!formData.nit?.trim()) {
+      newErrors.nit = 'El NIT es requerido';
+    } else if (!isEditing && nitsExistentes.includes(formData.nit.trim())) {
+      newErrors.nit = 'Ya existe un proveedor con este NIT';
+    }
     if (!formData.direccion?.trim()) newErrors.direccion = 'La dirección es requerida';
-    if (!formData.telefono?.trim()) newErrors.telefono = 'El teléfono es requerido';
+    if (!formData.telefono?.trim()) {
+      newErrors.telefono = 'El teléfono es requerido';
+    } else if (!isEditing && telefonosExistentes.includes(formData.telefono.trim())) {
+      newErrors.telefono = 'Ya existe un proveedor con este teléfono';
+    }
     if (!formData.email?.trim()) {
       newErrors.email = 'El email es requerido';
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email inválido';
+    } else if (!isEditing && emailsExistentes.includes(formData.email.trim())) {
+      newErrors.email = 'Ya existe un proveedor con este email';
     }
     if (!isEditing && !formData.password?.trim()) {
       newErrors.password = 'La contraseña es requerida para nuevos proveedores';

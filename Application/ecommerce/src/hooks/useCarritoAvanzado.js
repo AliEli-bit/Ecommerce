@@ -25,6 +25,7 @@ export const useCarritoAvanzado = () => {
 
   // Agregar producto con notificación
   const agregarConNotificacion = useCallback(async (producto, cantidad = 1) => {
+    console.log('Producto recibido en agregarConNotificacion:', producto);
     const result = await carrito.agregarAlCarrito(producto, cantidad);
     
     if (result.success) {
@@ -53,7 +54,7 @@ export const useCarritoAvanzado = () => {
   const totales = {
     subtotal: carrito.total,
     impuestos: carrito.total * 0.16, // 16% de IVA
-    envio: carrito.total > 500 ? 0 : 5, // Envío gratis sobre $500
+    envio: carrito.total > 500 ? 0 : 5, // Envío gratis sobre Bs 500
     total: carrito.total + (carrito.total * 0.16) + (carrito.total > 500 ? 0 : 5)
   };
 
@@ -69,25 +70,25 @@ export const useCarritoAvanzado = () => {
   // Obtener cantidad de un producto en el carrito
   const getCantidadEnCarrito = useCallback((productoId) => {
     const item = carrito.items.find(item => 
-      (item.producto._id || item.producto.id) === productoId
+      item.producto && ((item.producto._id || item.producto.id) === productoId)
     );
     return item ? item.cantidad : 0;
   }, [carrito.items]);
 
   // Transferir carrito al hacer login
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    const sessionId = localStorage.getItem('carritoSessionId');
-    
-    if (token && sessionId) {
-      // Usuario se acaba de loguear y tiene carrito de sesión
-      carrito.transferirCarrito().then(result => {
-        if (result.success) {
-          showNotification('Carrito sincronizado correctamente');
-        }
-      });
-    }
-  }, [carrito, showNotification]);
+  // useEffect(() => {
+  //   const token = localStorage.getItem('token');
+  //   const sessionId = localStorage.getItem('carritoSessionId');
+  
+  //   if (token && sessionId) {
+  //     // Usuario se acaba de loguear y tiene carrito de sesión
+  //     carrito.transferirCarrito().then(result => {
+  //       if (result.success) {
+  //         showNotification('Carrito sincronizado correctamente');
+  //       }
+  //     });
+  //   }
+  // }, [carrito, showNotification]);
 
   return {
     // Estado del carrito original

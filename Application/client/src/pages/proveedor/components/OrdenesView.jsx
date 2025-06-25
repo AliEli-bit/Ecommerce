@@ -150,7 +150,7 @@ const OrdenesView = ({ open, onClose }) => {
                   <TableCell>
                     {orden.datosContacto?.nombre || 'N/A'}
                   </TableCell>
-                  <TableCell>${orden.total.toFixed(2)}</TableCell>
+                  <TableCell>Bs {orden.total.toFixed(2)}</TableCell>
                   <TableCell>
                     <Chip
                       label={orden.estadoPago}

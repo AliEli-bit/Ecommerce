@@ -28,6 +28,7 @@ import ProveedorForm from './components/ProveedorForm';
 import ProductosDonadosCard from './components/ProductosDonadosCard';
 import ReportesCard from './components/ReportesCard';
 import { useAuth } from '../../context/AuthContext';
+import axios from 'axios';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -162,6 +163,18 @@ const Dashboard = () => {
     }
   };
 
+  const handleAcceptProveedor = async (proveedorId) => {
+    try {
+      const response = await axios.put(`/api/proveedores/${proveedorId}/estado`, { estado: 'aprobado' });
+      const proveedorActualizado = response.data;
+      setProveedores(prev =>
+        prev.map(p => p._id === proveedorId ? proveedorActualizado : p)
+      );
+    } catch (error) {
+      alert('Error al aprobar proveedor');
+    }
+  };
+
   if (loadingProveedores || loadingProductos) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -284,6 +297,7 @@ const Dashboard = () => {
                 handleOpenProveedorForm(proveedor);
               }}
               onDelete={handleDeleteProveedor}
+              onAccept={handleAcceptProveedor}
             />
           </div>
           <div className="bg-white rounded-xl shadow-sm p-6">

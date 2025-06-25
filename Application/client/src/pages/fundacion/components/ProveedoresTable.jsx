@@ -30,13 +30,15 @@ import ImageIcon from '@mui/icons-material/Image';
 import PhotoLibraryIcon from '@mui/icons-material/PhotoLibrary';
 import NoPhotographyIcon from '@mui/icons-material/NoPhotography';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import CheckIcon from '@mui/icons-material/Check';
 
 const ProveedoresTable = ({
   proveedores,
   loading,
   error,
   onEdit,
-  onDelete
+  onDelete,
+  onAccept
 }) => {
   const [imageDialogOpen, setImageDialogOpen] = useState(false);
   const [selectedProveedor, setSelectedProveedor] = useState(null);
@@ -366,7 +368,18 @@ const ProveedoresTable = ({
                         </IconButton>
                       </Tooltip>
                     )}
-                    
+                    {/* Botón para aceptar proveedor si está pendiente */}
+                    {proveedor.estado === 'pendiente' && onAccept && (
+                      <Tooltip title="Aceptar proveedor">
+                        <IconButton
+                          size="small"
+                          onClick={() => onAccept(proveedor._id)}
+                          sx={{ color: 'success.main' }}
+                        >
+                          <CheckIcon />
+                        </IconButton>
+                      </Tooltip>
+                    )}
                     <Tooltip title="Editar">
                       <IconButton
                         size="small"
@@ -376,7 +389,6 @@ const ProveedoresTable = ({
                         <EditIcon />
                       </IconButton>
                     </Tooltip>
-                    
                     <Tooltip title="Eliminar">
                       <IconButton
                         size="small"

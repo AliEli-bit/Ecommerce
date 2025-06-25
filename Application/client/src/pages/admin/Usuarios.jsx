@@ -226,7 +226,7 @@ const Usuarios = () => {
             </Box>
           </Box>
           <Box sx={{ flexGrow: 1 }} />
-          <Button
+          {/* <Button
             variant="contained"
             color="primary"
             startIcon={<AddIcon />}
@@ -243,7 +243,7 @@ const Usuarios = () => {
             }}
           >
             Nuevo Usuario
-          </Button>
+          </Button> */}
         </Toolbar>
       </AppBar>
 

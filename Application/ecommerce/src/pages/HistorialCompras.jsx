@@ -80,9 +80,9 @@ const HistorialCompras = () => {
   };
 
   const formatPrice = (price) => {
-    return new Intl.NumberFormat('es-MX', {
+    return new Intl.NumberFormat('es-BO', {
       style: 'currency',
-      currency: 'MXN'
+      currency: 'BOB'
     }).format(price);
   };
 

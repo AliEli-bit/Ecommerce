@@ -23,9 +23,9 @@ export const useProducts = (proveedorId = null) => {
 
   const priceRanges = [
     { id: 'todos', name: 'Todos los precios' },
-    { id: '0-50', name: 'Hasta $50' },
-    { id: '50-100', name: 'De $50 a $100' },
-    { id: '100+', name: 'Más de $100' }
+    { id: '0-50', name: 'Hasta Bs 50' },
+    { id: '50-100', name: 'De Bs 50 a Bs 100' },
+    { id: '100+', name: 'Más de Bs 100' }
   ]
 
   useEffect(() => {

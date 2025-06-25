@@ -72,6 +72,7 @@ const ProductosProveedor = () => {
   }, [proveedorId]);
 
   const handleAddToCartWithNotification = async (product) => {
+    console.log('Producto que se intenta agregar:', product);
     await agregarConNotificacion(product, 1);
   };
 
@@ -268,7 +269,7 @@ const ProductosProveedor = () => {
 
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-xl font-bold text-orange-600">
-                            ${product.price}
+                            Bs {product.price}
                           </span>
                           <span className="text-sm text-gray-500">
                             por {product.unit}

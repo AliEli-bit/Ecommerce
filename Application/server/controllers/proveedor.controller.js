@@ -243,10 +243,21 @@ export const actualizarProveedor = async (req, res) => {
 // Eliminar un proveedor
 export const eliminarProveedor = async (req, res) => {
   try {
-    const proveedor = await Proveedor.findByIdAndDelete(req.params.id);
+    const proveedor = await Proveedor.findById(req.params.id);
     if (!proveedor) {
       return res.status(404).json({ message: 'Proveedor no encontrado' });
     }
+
+    // Eliminar el usuario asociado al proveedor
+    await Usuario.findOneAndDelete({
+      rol: 'proveedor',
+      entidadRelacionada: proveedor._id,
+      rolModel: 'Proveedor'
+    });
+
+    // Eliminar el proveedor
+    await Proveedor.findByIdAndDelete(req.params.id);
+    
     res.json({ message: 'Proveedor eliminado correctamente' });
   } catch (error) {
     res.status(500).json({ message: error.message });

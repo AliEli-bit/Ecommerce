@@ -11,7 +11,6 @@ const QuickActions = ({ onNavigate }) => {
     { label: 'Fundaciones', icon: <BusinessIcon />, color: 'blue', path: '/admin/fundaciones' },
     { label: 'Proveedores', icon: <StoreIcon />, color: 'green', path: '/admin/proveedores' },
     { label: 'Usuarios', icon: <PeopleIcon />, color: 'red', path: '/admin/usuarios' },
-    { label: 'Reportes', icon: <AssessmentIcon />, color: 'purple', path: '/admin/reportes' },
   ];
 
   return (

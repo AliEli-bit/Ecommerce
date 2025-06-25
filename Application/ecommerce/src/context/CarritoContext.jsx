@@ -61,7 +61,7 @@ const carritoReducer = (state, action) => {
     case CARRITO_ACTIONS.ADD_ITEM:
       const newItems = [...state.items];
       const existingItem = newItems.find(item => 
-        item.producto._id === action.payload.producto._id
+        item.producto && item.producto._id === action.payload.producto._id
       );
       
       if (existingItem) {
@@ -84,7 +84,7 @@ const carritoReducer = (state, action) => {
       
     case CARRITO_ACTIONS.UPDATE_ITEM:
       const updatedItems = state.items.map(item => {
-        if (item.producto._id === action.payload.productoId) {
+        if (item.producto && item.producto._id === action.payload.productoId) {
           return {
             ...item,
             cantidad: action.payload.cantidad,
@@ -106,7 +106,7 @@ const carritoReducer = (state, action) => {
       
     case CARRITO_ACTIONS.REMOVE_ITEM:
       const filteredItems = state.items.filter(item => 
-        item.producto._id !== action.payload
+        item.producto && item.producto._id !== action.payload
       );
       
       const filteredTotal = filteredItems.reduce((sum, item) => sum + item.subtotal, 0);
@@ -188,6 +188,7 @@ export const CarritoProvider = ({ children }) => {
   };
 
   const agregarAlCarrito = async (producto, cantidad = 1) => {
+    console.log('Producto recibido en agregarAlCarrito:', producto);
     try {
       dispatch({ type: CARRITO_ACTIONS.SET_LOADING, payload: true });
       
@@ -197,6 +198,10 @@ export const CarritoProvider = ({ children }) => {
       }, {
         headers: getHeaders()
       });
+      
+      // Log de la respuesta de la API
+      console.log('Respuesta de la API al agregar:', response.data);
+      console.log('Items en el carrito después de agregar:', response.data.carrito.items);
       
       dispatch({ 
         type: CARRITO_ACTIONS.SET_CARRITO, 

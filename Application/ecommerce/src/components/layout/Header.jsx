@@ -22,15 +22,6 @@ export default function Header() {
         </nav>
         
         <div className="flex items-center gap-4">
-          <Link to="/products" className="relative">
-            <Button variant="ghost" size="icon" className="text-gray-600 hover:text-gray-900">
-              <ShoppingBag className="h-5 w-5" />
-              <span className="sr-only">Carrito</span>
-              <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                0
-              </span>
-            </Button>
-          </Link>
           <div className="hidden md:flex items-center gap-3">
             <Link to="/login">
               <Button variant="ghost" className="text-gray-600 hover:text-gray-900">

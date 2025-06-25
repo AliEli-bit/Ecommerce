@@ -149,6 +149,10 @@ export const agregarAlCarrito = async (req, res) => {
     
     await carrito.save();
     
+    // Eliminar items con producto nulo (por datos corruptos o pruebas previas)
+    carrito.items = carrito.items.filter(item => item.producto);
+    await carrito.save();
+
     // Poblar los datos del producto para la respuesta
     await carrito.populate({
       path: 'items.producto',

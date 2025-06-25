@@ -333,7 +333,7 @@ const Dashboard = () => {
                   <div className="flex items-center space-x-4">
                     <div className="flex items-center">
                       <MoneyIcon className="w-4 h-4 text-green-600 mr-1" />
-                      <span className="text-sm text-gray-900">${producto.precio}</span>
+                      <span className="text-sm text-gray-900">Bs {producto.precio}</span>
                     </div>
                     <div className="flex items-center">
                       <CartIcon className="w-4 h-4 text-blue-600 mr-1" />

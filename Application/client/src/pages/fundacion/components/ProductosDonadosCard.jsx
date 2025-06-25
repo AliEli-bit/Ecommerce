@@ -195,7 +195,7 @@ const ProductosDonadosCard = () => {
             <Grid item xs={4}>
               <Box className="text-center">
                 <Typography variant="h4" color="secondary.main" fontWeight="bold">
-                  ${calcularTotalDonaciones().toFixed(2)}
+                  Bs {calcularTotalDonaciones().toFixed(2)}
                 </Typography>
                 <Typography variant="caption" color="textSecondary">
                   Valor Total
@@ -243,7 +243,7 @@ const ProductosDonadosCard = () => {
                     secondary={
                       <Box>
                         <Typography variant="caption" color="textSecondary">
-                          {orden.items?.length || 0} productos • ${orden.subtotalFundacion?.toFixed(2) || '0.00'}
+                          {orden.items?.length || 0} productos • Bs {orden.subtotalFundacion?.toFixed(2) || '0.00'}
                         </Typography>
                         <Typography variant="caption" display="block" color="textSecondary">
                           {new Date(orden.createdAt).toLocaleDateString('es-ES')} - {new Date(orden.createdAt).toLocaleTimeString('es-ES')}
@@ -354,7 +354,7 @@ const ProductosDonadosCard = () => {
                       secondary={
                         <Box>
                           <Typography variant="caption" display="block">
-                            Cantidad: {item.cantidad} • Precio unitario: ${item.precioUnitario?.toFixed(2)}
+                            Cantidad: {item.cantidad} • Precio unitario: Bs {item.precioUnitario?.toFixed(2)}
                           </Typography>
                           <Typography variant="caption" display="block">
                             Categoría: {item.producto?.categoria || 'No especificada'}
@@ -364,7 +364,7 @@ const ProductosDonadosCard = () => {
                     />
                     <ListItemSecondaryAction>
                       <Typography variant="body2" fontWeight="bold">
-                        ${item.subtotal?.toFixed(2)}
+                        Bs {item.subtotal?.toFixed(2)}
                       </Typography>
                     </ListItemSecondaryAction>
                   </ListItem>
@@ -379,17 +379,17 @@ const ProductosDonadosCard = () => {
                 <Grid container spacing={2}>
                   <Grid item xs={6}>
                     <Typography variant="body2">
-                      <strong>Subtotal:</strong> ${selectedOrden.subtotalFundacion?.toFixed(2) || '0.00'}
+                      <strong>Subtotal:</strong> Bs {selectedOrden.subtotalFundacion?.toFixed(2) || '0.00'}
                     </Typography>
                   </Grid>
                   <Grid item xs={6}>
                     <Typography variant="body2">
-                      <strong>Total Original:</strong> ${selectedOrden.totalOriginal?.toFixed(2) || '0.00'}
+                      <strong>Total Original:</strong> Bs {selectedOrden.totalOriginal?.toFixed(2) || '0.00'}
                     </Typography>
                   </Grid>
                   <Grid item xs={12}>
                     <Typography variant="h6" color="primary" fontWeight="bold">
-                      Valor Donado: ${selectedOrden.subtotalFundacion?.toFixed(2) || '0.00'}
+                      Valor Donado: Bs {selectedOrden.subtotalFundacion?.toFixed(2) || '0.00'}
                     </Typography>
                   </Grid>
                 </Grid>

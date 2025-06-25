@@ -72,7 +72,7 @@ const Cart = ({ cart, onRemoveFromCart, onUpdateQuantity, isOpen, onClose }) => 
                       <div className="flex-1">
                         <h3 className="font-medium text-[#0f172a]">{item.name}</h3>
                         <p className="text-sm text-gray-500">
-                          ${item.price} por {item.unit}
+                          Bs {item.price} por {item.unit}
                         </p>
                         <div className="flex items-center mt-2 space-x-2">
                           <button
@@ -91,7 +91,7 @@ const Cart = ({ cart, onRemoveFromCart, onUpdateQuantity, isOpen, onClose }) => 
                             <Plus className="w-3 h-3" />
                           </button>
                           <span className="text-sm text-gray-600 ml-2">
-                            = ${(item.price * item.quantity).toFixed(2)}
+                            = Bs {(item.price * item.quantity).toFixed(2)}
                           </span>
                         </div>
                       </div>
@@ -117,7 +117,7 @@ const Cart = ({ cart, onRemoveFromCart, onUpdateQuantity, isOpen, onClose }) => 
                 </div>
                 <div className="flex justify-between items-center mb-4">
                   <span className="font-medium text-[#0f172a]">Total:</span>
-                  <span className="font-bold text-[#0f172a]">${calculateTotal().toFixed(2)}</span>
+                  <span className="font-bold text-[#0f172a]">Bs {calculateTotal().toFixed(2)}</span>
                 </div>
                 <button
                   onClick={() => setShowPaymentForm(true)}

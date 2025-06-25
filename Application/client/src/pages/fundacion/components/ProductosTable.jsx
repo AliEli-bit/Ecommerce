@@ -223,7 +223,7 @@ const ProductosTable = ({
             </Typography>
             <Box mt={1} display="flex" gap={2} flexWrap="wrap">
               <Typography variant="body2" color="textSecondary">
-                <strong>Precio:</strong> ${selectedProducto.precio}
+                <strong>Precio:</strong> Bs {selectedProducto.precio}
               </Typography>
               <Typography variant="body2" color="textSecondary">
                 <strong>Stock:</strong> {selectedProducto.stock} {selectedProducto.unidad}

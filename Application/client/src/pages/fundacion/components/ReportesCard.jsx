@@ -547,7 +547,7 @@ const ReportesCard = () => {
                       borderColor: 'warning.200'
                     }}>
                       <Typography variant="h3" color="warning.main" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                        ${stats.totalValor.toFixed(2)}
+                        Bs {stats.totalValor.toFixed(2)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                         Valor Total
@@ -564,7 +564,7 @@ const ReportesCard = () => {
                       borderColor: 'secondary.200'
                     }}>
                       <Typography variant="h3" color="secondary.main" sx={{ fontWeight: 'bold', mb: 0.5 }}>
-                        ${stats.promedioPorDonacion.toFixed(2)}
+                        Bs {stats.promedioPorDonacion.toFixed(2)}
                       </Typography>
                       <Typography variant="body2" color="text.secondary" sx={{ fontWeight: 500 }}>
                         Promedio
@@ -660,12 +660,12 @@ const ReportesCard = () => {
                             </TableCell>
                             <TableCell align="right">
                               <Typography variant="body2" sx={{ fontWeight: 500 }}>
-                                ${item.precioUnitario?.toFixed(2)}
+                                Bs {item.precioUnitario?.toFixed(2)}
                               </Typography>
                             </TableCell>
                             <TableCell align="right">
                               <Typography variant="body2" sx={{ fontWeight: 'bold', color: 'success.main' }}>
-                                ${item.subtotal?.toFixed(2)}
+                                Bs {item.subtotal?.toFixed(2)}
                               </Typography>
                             </TableCell>
                             <TableCell>

@@ -158,11 +158,20 @@ export const obtenerProducto = async (req, res) => {
 // Actualizar un producto
 export const actualizarProducto = async (req, res) => {
   try {
-    const fundacion = req.user.entidadRelacionada;
-    const producto = await Producto.findOne({
-      _id: req.params.id,
-      fundacion
-    });
+    let query = { _id: req.params.id };
+
+    // Permitir que fundaciones editen productos de su fundación
+    if (req.user.rol === 'fundacion') {
+      query.fundacion = req.user.entidadRelacionada;
+    }
+    // Permitir que proveedores editen productos que ellos crearon
+    else if (req.user.rol === 'proveedor') {
+      query.proveedor = req.user.entidadRelacionada;
+    } else {
+      return res.status(403).json({ message: 'No tiene permisos para editar productos' });
+    }
+
+    const producto = await Producto.findOne(query);
 
     if (!producto) {
       return res.status(404).json({ message: 'Producto no encontrado' });
@@ -172,7 +181,7 @@ export const actualizarProducto = async (req, res) => {
     if (req.body.proveedor && req.body.proveedor !== producto.proveedor.toString()) {
       const proveedorExiste = await Proveedor.findOne({
         _id: req.body.proveedor,
-        fundacion
+        fundacion: producto.fundacion
       });
 
       if (!proveedorExiste) {

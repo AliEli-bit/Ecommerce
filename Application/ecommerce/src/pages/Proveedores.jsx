@@ -55,7 +55,11 @@ const Proveedores = () => {
       <header className="bg-white shadow-sm fixed top-0 left-0 right-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <div className="flex items-center gap-4">
-            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
+            <div
+              className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center cursor-pointer hover:bg-orange-600 transition"
+              onClick={() => navigate('/')}
+              title="Ir al inicio"
+            >
               <Home className="w-5 h-5 text-white" />
             </div>
             <h1 className="text-2xl font-bold text-gray-900">
